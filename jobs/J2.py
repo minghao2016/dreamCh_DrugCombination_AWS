@@ -138,8 +138,8 @@ def run_sklearn(train_libfm, test_libfm,testPredCSV,testCSV , n_est=1000, lr=0.0
 
 
 os.makedirs("data/" + str(round_num) + "/J2condor/result/")
-run_sklearn("/mina/data/" + round_num + "/J1condor/set"+str(value4)+"/Train_single_new.libfm", # single train set
-            "/mina/data/" + round_num + "/J1condor/set"+str(value4)+"/Test_single_new.libfm", # single test set
+run_sklearn("/mina/data/" + str(round_num) + "/J1condor/set"+str(value4)+"/Train_single_new.libfm", # single train set
+            "/mina/data/" + str(round_num) + "/J1condor/set"+str(value4)+"/Test_single_new.libfm", # single test set
             "data/" + str(round_num) + "/J2condor/result/svm_result"+str(value1)+"_"+str(value2)+"_"+str(value4)+".csv", # result file path
             "/pizza/data/answer/ch1_new_test_set_"+str(value4)+".csv", # answer set
             maxindexBool=True)
