@@ -7,7 +7,7 @@ from email.header    import Header
 import shutil
 
 #def makeExcludedIndex(resultDataDir, extractedColumnIndexPath, threshold=8, numberOfExcludedIndex=50):
-def makeExcludedIndex(resultDataDir, extractedColumnIndexPath, threshold=6, numberOfExcludedIndex=50):
+def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, threshold=6, numberOfExcludedIndex=50):
     """
     :param resultDataDir: there must be 10 files named ["result_N.csv"(N : 0 to 9)]
     :param extractedColumnIndexPath: result file path including file name. 'txt' file type is recommended.
@@ -41,7 +41,7 @@ def makeExcludedIndex(resultDataDir, extractedColumnIndexPath, threshold=6, numb
     resultDF = pd.DataFrame({"Mean":meanList, "Count":countList}, index=indexList)
     resultDF_sorted = resultDF.sort_values(["Count", "Mean"], ascending=False)
 
-    contents = "Top 20% \n"
+    contents = "Top 20% in Round #" + round_num + "\n"
     mainContentNumber = int(len(resultDF_sorted.index) * 0.2)
 
     main_count = 0
@@ -104,4 +104,4 @@ def makeExcludedIndex(resultDataDir, extractedColumnIndexPath, threshold=6, numb
 
 if __name__ == '__main__':
     round_num = sys.argv[1]
-    makeExcludedIndex("J5condor/result/", "data/" + str(int(round_num)+1) + "/J6condor/result/excludedIndexes.txt")
+    makeExcludedIndex(round_num, "J5condor/result/", "data/" + str(int(round_num)+1) + "/J6condor/result/excludedIndexes.txt")

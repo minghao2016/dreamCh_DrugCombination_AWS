@@ -40,8 +40,6 @@ def find_max_index(train_libfm, test_libfm):
 
     return max(index_list)
 
-
-
 def convertToSKlearnInput_withMaxIndex(libfmFile,maxIndex):
     with open(libfmFile,'r') as r:
         synergy_list=[]

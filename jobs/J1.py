@@ -69,6 +69,12 @@ def execute(round_num):
     for p in processes:
         p.join()
 
+    # rewrite result6 file
+    total_j6_file_path = "data/" + str(round_idx) + "/J6condor/result/excludedIndexes.txt"
+    f = open(total_j6_file_path, 'w')
+    f.write('\n'.join([ str(val) for val in droplines ]))
+    f.close()
+
 
 
     #`call(["bash", "uploader.sh"])

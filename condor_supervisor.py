@@ -45,7 +45,7 @@ class Supervisor():
         self.execute_job1_distribute_data()
         # Step2 : Generate new condor submit according to target dir path
         submit_file_path = self.generate_submit_form()
-	
+
 	time.sleep(10)
         # Step3 : submit condor job submit file
         self.send_submit_form(submit_file_path)
@@ -62,7 +62,7 @@ class Supervisor():
         src_dir = '/'.join(['data', str(self.round_num-1), 'J1condor'])
         dst_dir = '/'.join(['data', str(self.round_num), 'J1condor'])
         try:
-            shutil.copytree(src_dir, dst_dir) 
+            shutil.copytree(src_dir, dst_dir)
         except IOError:
             pass
 
@@ -108,14 +108,25 @@ class Supervisor():
 
     def send_result2email(self):
         if self.round_num != 0:
+
             content = ['#Round ' + str(self.round_num-1)]
 
+            value_sum = .0
             f = open('/'.join(['data', str(self.round_num-1), 'J3condor', 'result', 'baseline.csv']))
-            content.append(f.read())
+            for line in f :
+                if 'index' in line:
+                    continue
 
+                line = line.strip()
+                value_sum += float(line.split(',')[1])
+                content.append(line)
             f.close()
 
-            email_sender.send('\n\n'.join(content))
+
+            content.append("# Avg ")
+            content.append(str(value_sum/10))
+
+            email_sender.send('\n'.join(content))
 
 
 
