@@ -10,7 +10,6 @@ import shutil
 from sklearn.ensemble import GradientBoostingRegressor
 import sklearn.ensemble as ensemble
 from sklearn.isotonic import isotonic_regression
-from sklearn.kernel_ridge import KernelRidge
 import sklearn.linear_model as linear_model
 import sklearn.gaussian_process as gaussian
 import sklearn.neighbors as neigbors
@@ -135,12 +134,12 @@ def run_sklearn(train_libfm, test_libfm,testPredCSV,testCSV , n_est=1000, lr=0.0
 
 
 
-root_dir = "/home/ubuntu/data/" + round_num
+root_dir = "/home/ubuntu/data/" + str(round_num)
 os.makedirs("data/" + str(round_num) + "/J2condor/result/")
 run_sklearn(root_dir + "/J1condor/includeTestSamples_1a/set"+str(value4)+"/Train_single_new.libfm", # single train set
             root_dir + "/J1condor/includeTestSamples_1a/set"+str(value4)+"/Test_single_new.libfm", # single test set
             "data/" + str(round_num) + "/J2condor/result/svm_result"+str(value1)+"_"+str(value2)+"_"+str(value4)+".csv", # result file path
-            "/home/ubuntu/answers/ch1_newtestset_wtest_"+str(value4)+".csv", # answer set
+            "/home/ubuntu/data/answers/ch1_newtestset_wtest_"+str(value4)+".csv", # answer set
             maxindexBool=True)
 """
 run_sklearn("J1condor/set"+str(value4)+"/Train_single_new.libfm", # single train set

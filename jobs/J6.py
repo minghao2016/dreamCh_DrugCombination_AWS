@@ -1,9 +1,10 @@
 import pandas as pd
 import numpy as np
-import os
+import os, sys
 import smtplib
 from email.mime.text import MIMEText
 from email.header    import Header
+import shutil
 
 def makeExcludedIndex(resultDataDir, extractedColumnIndexPath, threshold=8, numberOfExcludedIndex=50):
     """
@@ -88,8 +89,12 @@ def makeExcludedIndex(resultDataDir, extractedColumnIndexPath, threshold=8, numb
         s.quit()
 
     resultDF_overThreshold = resultDF_sorted[resultDF_sorted["Count"] >= threshold]
-
     extractedColumnIndexList = list(resultDF_overThreshold.index[0:numberOfExcludedIndex])
+
+    paths = extractedColumnIndexPath.split('/')
+    target_dir = '/'.join(paths[:-1])
+    os.makedirs(target_dir)
+
     with open(extractedColumnIndexPath, "w") as fw:
         for v in extractedColumnIndexList:
             fw.write(str(v) + "\n")
@@ -98,4 +103,4 @@ def makeExcludedIndex(resultDataDir, extractedColumnIndexPath, threshold=8, numb
 
 if __name__ == '__main__':
     round_num = sys.argv[1]
-    makeExcludedIndex("J5condor/result/", "data/" + str(round_num+1) + "/J6condor/result/excludedIndexes.txt")
+    makeExcludedIndex("J5condor/result/", "data/" + str(int(round_num)+1) + "/J6condor/result/excludedIndexes.txt")

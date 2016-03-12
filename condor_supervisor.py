@@ -43,7 +43,6 @@ class Supervisor():
             self.move_J1data()
 
         self.execute_job1_distribute_data()
-        sys.exit()
         # Step2 : Generate new condor submit according to target dir path
         submit_file_path = self.generate_submit_form()
 
@@ -53,11 +52,11 @@ class Supervisor():
 
     def execute_job1_distribute_data(self):
         #step1 : execute Job on locally
-        if self.round_num != 0:
-            J1.execute(self.round_num)
+        #J1.execute(self.round_num)
 
         #step2 : distributing data
-        call(['bash', 'uploader.sh', str(self.round_num)])
+        #call(['bash', 'uploader.sh', str(self.round_num)])
+	pass
 
     def move_J1data(self):
         src_dir = '/'.join(['data', str(self.round_num-1), 'J1condor'])
@@ -119,7 +118,7 @@ class Supervisor():
 
 if __name__ == '__main__':
     supervisor = Supervisor()
-
+    """
     while True:
         if len(sys.argv) > 1:
             supervisor.round_num = int(sys.argv[1])
@@ -133,5 +132,5 @@ if __name__ == '__main__':
         else:
             supervisor.execute_new_cycle()
             time.sleep(2)
-
-    #supervisor.generate_submit_form()
+    """
+    supervisor.generate_submit_form()
