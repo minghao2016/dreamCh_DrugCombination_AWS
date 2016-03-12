@@ -13,7 +13,7 @@ def params(round_num):
         pastRound_bestC = int(float(params[0]))
 
 
-    c_list = range(pastRound_bestC - 20*6, pastRound_bestC + 20*6, 20)
+    c_list = range(pastRound_bestC - 20*6, pastRound_bestC + 20*6, 10)
     gamma_list = [x/1000.0 for x in range(1,100,20)]
 
     values = [

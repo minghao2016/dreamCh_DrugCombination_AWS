@@ -36,14 +36,14 @@ class Supervisor():
     """
     def execute_new_cycle(self):
         # Step0: send previous result
-        #self.send_result2email()
+        self.send_result2email()
 
         # Step1 :
         if self.round_num != 0:
             self.move_J1data()
 
         self.execute_job1_distribute_data()
-
+        sys.exit()
         # Step2 : Generate new condor submit according to target dir path
         submit_file_path = self.generate_submit_form()
 
@@ -68,6 +68,7 @@ class Supervisor():
         src_dir = '/'.join(['data', str(self.round_num-1), 'J6condor'])
         dst_dir = '/'.join(['data', str(self.round_num), 'J6condor'])
         shutil.copytree(src_dir, dst_dir)
+
     def generate_submit_form(self):
         self.job_gen.set_round_num(self.round_num)
 
@@ -100,7 +101,7 @@ class Supervisor():
     def send_submit_form(self, submit_dir_path):
         call(['condor_submit_dag', '-maxidle','1000',submit_dir_path + '/DAGman.' + str(self.round_num) + '.dag'])
 
-        time.sleep(10)
+        time.sleep(20)
         self.run_flag = True
 
     def send_result2email(self):
@@ -109,6 +110,7 @@ class Supervisor():
 
             f = open('/'.join(['data', str(self.round_num-1), 'J3condor', 'result', 'baseline.csv']))
             content.append(f.read())
+
             f.close()
 
             email_sender.send('\n\n'.join(content))
@@ -118,18 +120,18 @@ class Supervisor():
 if __name__ == '__main__':
     supervisor = Supervisor()
 
-    if len(sys.argv) > 1:
-        supervisor.round_num = int(sys.argv[1])
+    while True:
+        if len(sys.argv) > 1:
+            supervisor.round_num = int(sys.argv[1])
 
-    if supervisor.exist_jobs('run'):
-        #TODO: nothing to do
-        pass
-    elif supervisor.exist_jobs('held'):
-        #TODO: save log and send email
-        pass
-    else:
-        supervisor.execute_new_cycle()
-        time.sleep(600)
-
+        if supervisor.exist_jobs('run'):
+            #TODO: nothing to do
+            pass
+        elif supervisor.exist_jobs('held'):
+            #TODO: save log and send email
+            pass
+        else:
+            supervisor.execute_new_cycle()
+            time.sleep(2)
 
     #supervisor.generate_submit_form()

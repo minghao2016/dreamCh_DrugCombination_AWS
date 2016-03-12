@@ -145,7 +145,8 @@ for root, dirs, files in os.walk(filePath):
         deleteIndex = zz.split("_")[0]
 
 
-        trainDir = "/pizza/data/answer/ch1_new_test_set_" + str(index)+".csv"#answerSewt
+        testsetpath = "/home/ubuntu/data/answers/ch1_newtestset_wtest_"
+        trainDir = testsetpath + str(index)+".csv"#answerSewt
         value = robjects.r['getGlobalScore_ch1'](trainDir,cvFileName)[1]
 
         sunKyu_Value = value - baseline[int(index)]

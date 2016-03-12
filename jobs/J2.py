@@ -17,7 +17,6 @@ import sklearn.neighbors as neigbors
 
 # filePath = "/pizza/"
 # filePath = "C:/Users/Jang/Desktop/pizza/"
-filePath = "/pizza/"
 
 round_num = int(sys.argv[1])
 value1 = float(sys.argv[2])
@@ -136,12 +135,12 @@ def run_sklearn(train_libfm, test_libfm,testPredCSV,testCSV , n_est=1000, lr=0.0
 
 
 
-
+root_dir = "/home/ubuntu/data/" + round_num
 os.makedirs("data/" + str(round_num) + "/J2condor/result/")
-run_sklearn("/mina/data/" + str(round_num) + "/J1condor/set"+str(value4)+"/Train_single_new.libfm", # single train set
-            "/mina/data/" + str(round_num) + "/J1condor/set"+str(value4)+"/Test_single_new.libfm", # single test set
+run_sklearn(root_dir + "/J1condor/includeTestSamples_1a/set"+str(value4)+"/Train_single_new.libfm", # single train set
+            root_dir + "/J1condor/includeTestSamples_1a/set"+str(value4)+"/Test_single_new.libfm", # single test set
             "data/" + str(round_num) + "/J2condor/result/svm_result"+str(value1)+"_"+str(value2)+"_"+str(value4)+".csv", # result file path
-            "/pizza/data/answer/ch1_new_test_set_"+str(value4)+".csv", # answer set
+            "/home/ubuntu/answers/ch1_newtestset_wtest_"+str(value4)+".csv", # answer set
             maxindexBool=True)
 """
 run_sklearn("J1condor/set"+str(value4)+"/Train_single_new.libfm", # single train set

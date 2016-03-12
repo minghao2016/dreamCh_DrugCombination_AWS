@@ -40,3 +40,8 @@ j6 = {
     'arguments': ['J6.py'],
     'requirements': 'Requirements = (OpSys == "LINUX")'
 }
+
+aws = {
+    'accessKeyID': 'AKIAIEJBO47SRVU2332Q',
+    'secretAccessKey': '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'
+}

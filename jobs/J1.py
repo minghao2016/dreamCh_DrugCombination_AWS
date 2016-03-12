@@ -11,15 +11,15 @@ def execute(round_num):
     #input1:defaultTrainlibfm
     #input2:defaultTestlibfm
 
-    defaultTrainlibfm = "excludeTrain_single.libfm"
-    defaultTestlibfm = "excludeTest_single.libfm"
+    defaultTestlibfm = "includeTest_single_1a.libfm"
+    defaultTrainlibfm = "includeTrain_single_1a.libfm"
 
     # defaultTrainlibfm = sys.argv[0]
     # defaultTestlibfm = sys.argv[1]
     round_num_str = str(round_num)
 
 
-    dataFilePath = "data/" + round_num_str + "/J1condor/"
+    dataFilePath = "data/" + round_num_str + "/J1condor/includeTestSamples_1a/"
     j6FilePath = "data/" + round_num_str + "/J6condor/result/"
 
     #test

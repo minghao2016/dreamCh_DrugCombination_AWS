@@ -158,16 +158,19 @@ for fn in os.listdir(featureFolderPath):
     for l in f:
         delfeatlist.append((int)(l.strip()))
     f.close()
-if value1 in delfeatlist:
-    sys.exit(0)
 
-os.makedirs("data/" + str(round_num) + "/J4condor/result/")
-run_sklearn("/mina/data/" + str(round_num) + "/J1condor/set"+str(value4)+"/Train_single_new.libfm", # single train set
-            "/mina/data/" + str(round_num) + "/J1condor/set"+str(value4)+"/Test_single_new.libfm", # single test set
-            "data/" + str(round_num) + "/J4condor/result/svm_result"+str(value1)+"_"+str(value4)+".csv",
-            "/pizza/data/answer/ch1_new_test_set_"+str(value4)+".csv",
-            #dellist,
-            1000, 0.07, 7, True)
+if value1 in delfeatlist:
+    shutil.makedirs('./data')
+else:
+    root_dir = "/home/ubuntu/data/" + round_num
+
+    os.makedirs("data/" + str(round_num) + "/J4condor/result/")
+    run_sklearn(root_dir + "/J1condor/includeTestSamples_1a/set"+str(value4)+"/Train_single_new.libfm", # single train set
+                root_dir + "/home/ubuntu//J1condor/includeTestSamples_1a/set"+str(value4)+"/Test_single_new.libfm", # single test set
+                "data/" + str(round_num) + "/J4condor/result/svm_result"+str(value1)+"_"+str(value4)+".csv",
+                "/home/ubuntu/answers/ch1_newtestset_wtest_"+str(value4)+".csv", # answer set
+                #dellist,
+                1000, 0.07, 7, True)
 """
 run_sklearn("J1condor/set"+str(value4)+"/Train_single_new.libfm", # single train set
             "J1condor/set"+str(value4)+"/Test_single_new.libfm", # single test set
