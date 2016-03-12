@@ -6,7 +6,8 @@ from email.mime.text import MIMEText
 from email.header    import Header
 import shutil
 
-def makeExcludedIndex(resultDataDir, extractedColumnIndexPath, threshold=8, numberOfExcludedIndex=50):
+#def makeExcludedIndex(resultDataDir, extractedColumnIndexPath, threshold=8, numberOfExcludedIndex=50):
+def makeExcludedIndex(resultDataDir, extractedColumnIndexPath, threshold=6, numberOfExcludedIndex=50):
     """
     :param resultDataDir: there must be 10 files named ["result_N.csv"(N : 0 to 9)]
     :param extractedColumnIndexPath: result file path including file name. 'txt' file type is recommended.

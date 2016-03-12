@@ -159,7 +159,7 @@ for fn in os.listdir(featureFolderPath):
     f.close()
 
 if value1 in delfeatlist:
-    shutil.makedirs('./data')
+    os.makedirs('./data')
 else:
     root_dir = "/home/ubuntu/data/" + str(round_num)
 

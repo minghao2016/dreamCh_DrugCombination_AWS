@@ -133,7 +133,7 @@ class Generator():
         dependencies.append('PARENT ' + ' '.join(j2_list) + ' CHILD THIRD')
         # job4
         j4_list = list()
-        for job4_idx in range(9540):
+        for job4_idx in range(60):
             idx = str(job4_idx)
             jobs.append('JOB FOURTH' + idx + ' ' + submit_dir + '/4.' + idx + '.submit')
             j4_list.append('FOURTH' + idx)
@@ -142,5 +142,12 @@ class Generator():
         # job2 retry
         job2_retry = ["Retry " + j2 + " 3" for j2 in j2_list]
         job4_retry = ["Retry " + j4 + " 3" for j4 in j4_list]
+	
+        # job 5
+        jobs.append('JOB FIFTH ' + submit_dir + '/5.0.submit')
+        dependencies.append('PARENT ' + ' '.join(j4_list) + ' CHILD FIFTH')
 
+        #job6
+        jobs.append('JOB SIXTH ' + submit_dir + '/6.0.submit')
+        dependencies.append('PARENT FIFTH  CHILD SIXTH')
         return '\n'.join(['\n'.join(jobs),'\n'.join(dependencies), '\n'.join(job2_retry), '\n'.join(job4_retry)])

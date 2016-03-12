@@ -18,8 +18,8 @@ def params(round_num):
 	
     values = [
             (c_value, gamma_value, dataset_num)
-            for c_value in c_list[:1]
-            for gamma_value in gamma_list[:1]
+            for c_value in c_list[-1:]
+            for gamma_value in gamma_list[-1:]
             for dataset_num in range(0,10)
             if c_value > 1
             ]

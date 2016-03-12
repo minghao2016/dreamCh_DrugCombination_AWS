@@ -45,7 +45,8 @@ class Supervisor():
         self.execute_job1_distribute_data()
         # Step2 : Generate new condor submit according to target dir path
         submit_file_path = self.generate_submit_form()
-
+	
+	time.sleep(10)
         # Step3 : submit condor job submit file
         self.send_submit_form(submit_file_path)
         self.round_num += 1
@@ -60,7 +61,10 @@ class Supervisor():
     def move_J1data(self):
         src_dir = '/'.join(['data', str(self.round_num-1), 'J1condor'])
         dst_dir = '/'.join(['data', str(self.round_num), 'J1condor'])
-        shutil.copytree(src_dir, dst_dir)
+        try:
+            shutil.copytree(src_dir, dst_dir) 
+        except IOError:
+            pass
 
     def move_J6data(self):
         src_dir = '/'.join(['data', str(self.round_num-1), 'J6condor'])
@@ -99,7 +103,7 @@ class Supervisor():
     def send_submit_form(self, submit_dir_path):
         call(['condor_submit_dag', '-maxidle','1000',submit_dir_path + '/DAGman.' + str(self.round_num) + '.dag'])
 
-        time.sleep(20)
+        time.sleep(60)
         self.run_flag = True
 
     def send_result2email(self):
@@ -117,6 +121,7 @@ class Supervisor():
 
 if __name__ == '__main__':
     supervisor = Supervisor()
+
     while True:
         if len(sys.argv) > 1:
             supervisor.round_num = int(sys.argv[1])
@@ -125,9 +130,8 @@ if __name__ == '__main__':
             #TODO: nothing to do
             pass
         elif supervisor.exist_jobs('held'):
-            #TODO: save log and send email
-            pass
+            email_sender.send("Job held!!!")
         else:
             supervisor.execute_new_cycle()
-            time.sleep(2)
+            time.sleep(10)
     #supervisor.generate_submit_form()
