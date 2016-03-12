@@ -13,7 +13,7 @@ j2 = {
 }
 
 j3 = {
-    'inputs': ['jobs/J3.py, excludedTestSet', 'J2condor', ],
+    'inputs': ['jobs/J3.py', 'J2condor', ],
     'outputs': [],
     'arguments': ['J3.py'],
     'requirements': 'Requirements = (OpSys == "LINUX")'
@@ -28,7 +28,7 @@ j4 = {
 }
 
 j5 = {
-    'inputs': ['jobs/J5.py,excludedTestSet', 'J3condor', 'J4condor'],
+    'inputs': ['jobs/J5.py', 'J3condor', 'J4condor'],
     'outputs': [],
     'arguments': ['J5.py'],
     'requirements': 'Requirements = (OpSys == "LINUX")'

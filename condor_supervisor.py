@@ -1,4 +1,4 @@
-import re, time, os, shutil
+import re, time, os, shutil, sys
 import email_sender
 from subprocess import check_output, call
 from JobGenerator.generator import Generator as Job_Generator
@@ -17,6 +17,7 @@ class Supervisor():
         }
 
         self.job_gen = Job_Generator()
+        self.run_flag = False
 
     """
     Check if job(s) exists in Condor Queue
@@ -35,7 +36,7 @@ class Supervisor():
     """
     def execute_new_cycle(self):
         # Step0: send previous result
-        self.send_result2email()
+        #self.send_result2email()
 
         # Step1 :
         if self.round_num != 0:
@@ -52,7 +53,8 @@ class Supervisor():
 
     def execute_job1_distribute_data(self):
         #step1 : execute Job on locally
-        J1.execute(self.round_num)
+        if self.round_num != 0:
+            J1.execute(self.round_num)
 
         #step2 : distributing data
         call(['bash', 'uploader.sh', str(self.round_num)])
@@ -60,9 +62,12 @@ class Supervisor():
     def move_J1data(self):
         src_dir = '/'.join(['data', str(self.round_num-1), 'J1condor'])
         dst_dir = '/'.join(['data', str(self.round_num), 'J1condor'])
-
         shutil.copytree(src_dir, dst_dir)
 
+    def move_J6data(self):
+        src_dir = '/'.join(['data', str(self.round_num-1), 'J6condor'])
+        dst_dir = '/'.join(['data', str(self.round_num), 'J6condor'])
+        shutil.copytree(src_dir, dst_dir)
     def generate_submit_form(self):
         self.job_gen.set_round_num(self.round_num)
 
@@ -95,6 +100,9 @@ class Supervisor():
     def send_submit_form(self, submit_dir_path):
         call(['condor_submit_dag', '-maxidle','1000',submit_dir_path + '/DAGman.' + str(self.round_num) + '.dag'])
 
+        time.sleep(10)
+        self.run_flag = True
+
     def send_result2email(self):
         if self.round_num != 0:
             content = ['#Round ' + str(self.round_num-1)]
@@ -110,16 +118,18 @@ class Supervisor():
 if __name__ == '__main__':
     supervisor = Supervisor()
 
-    while True:
-        if supervisor.exist_jobs('run'):
-            #TODO: nothing to do
-            pass
-        elif supervisor.exist_jobs('held'):
-            #TODO: save log and send email
-            pass
-        else:
-            supervisor.execute_new_cycle()
+    if len(sys.argv) > 1:
+        supervisor.round_num = int(sys.argv[1])
 
-        time.sleep(5)
+    if supervisor.exist_jobs('run'):
+        #TODO: nothing to do
+        pass
+    elif supervisor.exist_jobs('held'):
+        #TODO: save log and send email
+        pass
+    else:
+        supervisor.execute_new_cycle()
+        time.sleep(600)
+
 
     #supervisor.generate_submit_form()

@@ -30,9 +30,9 @@ class Generator():
 
     def __set_log_path__(self):
         self.log_paths = [
-                'output = log/' + '.'.join([str(self.round_num), str(self.job_num), '$(Process)','out']),
-                'log = log/'    + '.'.join([str(self.round_num), str(self.job_num), '$(ProcesS)','log']),
-                'error = log/'  + '.'.join([str(self.round_num), str(self.job_num), '$(Process)','err'])
+                'output = log/' + '.'.join([str(self.round_num), str(self.job_num), '$(Cluster)','out']),
+                'log = log/'    + '.'.join([str(self.round_num), str(self.job_num), '$(Cluster)','log']),
+                'error = log/'  + '.'.join([str(self.round_num), str(self.job_num), '$(Cluster)','err'])
                 ]
 
     def get_submit_content(self, job_num):
@@ -120,6 +120,7 @@ class Generator():
         j2_list = list()
         j2_jobs = glob.glob(submit_dir + '/2.*')
         #for job2_idx in range(len(j2_jobs)):
+
         for job2_idx in range(len(j2_jobs)):
             idx = str(job2_idx)
             jobs.append('JOB SECOND' + idx + ' ' + submit_dir + '/2.' + idx + '.submit')
@@ -130,7 +131,6 @@ class Generator():
         # job3
         jobs.append('JOB THIRD ' + submit_dir + '/3.0.submit')
         dependencies.append('PARENT ' + ' '.join(j2_list) + ' CHILD THIRD')
-
         # job4
         j4_list = list()
         for job4_idx in range(9540):
@@ -139,4 +139,8 @@ class Generator():
             j4_list.append('FOURTH' + idx)
         dependencies.append('PARENT THIRD CHILD ' + ' '.join(j4_list))
 
-        return '\n'.join(jobs) + '\n\n' + '\n'.join(dependencies)
+        # job2 retry
+        job2_retry = ["Retry " + j2 + " 3" for j2 in j2_list]
+        job4_retry = ["Retry " + j4 + " 3" for j4 in j4_list]
+
+        return '\n'.join(['\n'.join(jobs),'\n'.join(dependencies), '\n'.join(job2_retry), '\n'.join(job4_retry)])

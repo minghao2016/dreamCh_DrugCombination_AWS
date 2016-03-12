@@ -154,7 +154,7 @@ def run_sklearn(train_libfm, test_libfm,testPredCSV,testCSV , n_est=1000, lr=0.0
 
 delfeatlist = []
 for fn in os.listdir(featureFolderPath):
-    f = open(fn, 'r')
+    f = open('/'.join([featureFolderPath,fn]), 'r')
     for l in f:
         delfeatlist.append((int)(l.strip()))
     f.close()

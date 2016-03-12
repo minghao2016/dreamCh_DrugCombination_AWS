@@ -178,7 +178,7 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
 # This is an example of inputs and outputs
 if __name__ == '__main__':
 
-    testsetpath = "excludedTestSet/ch1_new_test_set_"
+    testsetpath = "/pizza/data/answer/ch1_new_test_set_"
     testsetList = []
     for i in range(10):
         testsetList.append(testsetpath+str(i)+".csv")

@@ -101,7 +101,7 @@ vignettes/*.pdf
 
 *.tar.gz
 *.zip
-data
+data*
 submit
 log
 excludedTestSet
