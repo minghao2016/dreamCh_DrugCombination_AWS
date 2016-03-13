@@ -15,7 +15,6 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
     """
     DataDir = resultDataDir
     dfList = []
-    meanthreshold = 0.0001
     for index in range(0,10):
         tempDF = pd.read_csv(DataDir + "/result_" + str(index) + ".csv", index_col=0, header=None)
         dfList.append(tempDF)
@@ -42,10 +41,6 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
     resultDF = pd.DataFrame({"Mean":meanList, "Count":countList}, index=indexList)
     resultDF_sorted = resultDF.sort_values(["Count", "Mean"], ascending=False)
 
-
-    resultDF_mean_sorted = resultDF.sort_values(["Mean"], ascending=False)
-
-
     contents = "Top 20% in Round #" + round_num + "\n"
     mainContentNumber = int(len(resultDF_sorted.index) * 0.2)
 
@@ -70,23 +65,6 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
         if main_count == mainContentNumber:
             break
         main_count += 1
-    resultDF_overThreshold = resultDF_sorted[resultDF_sorted["Count"] >= threshold]
-    resultDF_mean_overThreshold = resultDF_mean_sorted[resultDF_mean_sorted["Mean"] >= meanthreshold]
-
-    resultDF_overThreshold= resultDF_overThreshold.append(resultDF_mean_overThreshold)
-    extractedColumnIndexList = list(resultDF_overThreshold.index[0:numberOfExcludedIndex])
-
-    paths = extractedColumnIndexPath.split('/')
-    target_dir = '/'.join(paths[:-1])
-    os.makedirs(target_dir)
-
-    with open(extractedColumnIndexPath, "w") as fw:
-        for v in extractedColumnIndexList:
-            fw.write(str(v) + "\n")
-
-
-
-
     smtp_host = 'smtp.gmail.com'
     login, password = 'dmis.dreamchallenge@gmail.com', 'dmisinfos#1'
 
@@ -97,8 +75,6 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
             'leeheewon78@gmail.com',
             'kangj@korea.ac.kr',
             'minhwan90@gmail.com']
-    contents = "#removed: " + str(len(extractedColumnIndexList)) + "\n\n" + contents
-
     msg = MIMEText(contents, 'plain', 'utf-8')
     msg['Subject'] = Header('J6 Result', 'utf-8')
     msg['From'] = login
@@ -111,11 +87,19 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
         s.sendmail(msg['From'], recipients_emails, msg.as_string())
     finally:
         s.quit()
+    resultDF_overThreshold = resultDF_sorted[resultDF_sorted["Count"] >= threshold]
+    extractedColumnIndexList = list(resultDF_overThreshold.index[0:numberOfExcludedIndex])
+
+    paths = extractedColumnIndexPath.split('/')
+    target_dir = '/'.join(paths[:-1])
+    os.makedirs(target_dir)
+
+    with open(extractedColumnIndexPath, "w") as fw:
+        for v in extractedColumnIndexList:
+            fw.write(str(v) + "\n")
 
     return len(extractedColumnIndexList)
 
 if __name__ == '__main__':
     round_num = sys.argv[1]
     makeExcludedIndex(round_num, "J5condor/result/", "data/" + str(int(round_num)+1) + "/J6condor/result/excludedIndexes.txt")
-
-

@@ -4,7 +4,8 @@ from job4 import params as job4_param_gen
 
 
 class Generator():
-    def __init__(self):
+    def __init__(self, j1_type):
+        self.j1_type = j1_type
         self.common = [
                 'universe = vanilla',
                 'should_transfer_files = IF_NEEDED',
@@ -46,12 +47,14 @@ class Generator():
 
         submit_form = [
                 '\n'.join(self.common),
-                '\n'.join(self.log_paths),
                 'transfer_input_files = ' + ', '.join(inputs),
                 #'transfer_output_files = ' + ', '.join(outputs),
                 'transfer_output_files = data',
                 config['requirements'],
                 'arguments = ' + ' '.join(arguments)]
+
+        if job_num != 2 and job_num != 4:
+            submit_form.append('\n'.join(self.log_paths))
 
         if 'queue_num' in config:
             submit_form.append('queue ' + str(config['queue_num']))
@@ -86,7 +89,7 @@ class Generator():
         return result
 
     def get_submit_content_job2(self):
-        params = job2_param_gen(self.round_num)
+        params = job2_param_gen(self.round_num, self.j1_type)
 
         contents = list()
 
@@ -96,7 +99,7 @@ class Generator():
         return contents
 
     def get_submit_content_job4(self):
-        params = job4_param_gen()
+        params = job4_param_gen(self.j1_type)
 
         contents = list()
 
@@ -133,7 +136,12 @@ class Generator():
         dependencies.append('PARENT ' + ' '.join(j2_list) + ' CHILD THIRD')
         # job4
         j4_list = list()
-        for job4_idx in range(60):
+        if self.j1_type == 'a':
+            job4_size = 9540
+        else:
+            job4_size = 5870
+
+        for job4_idx in range(job4_size):
             idx = str(job4_idx)
             jobs.append('JOB FOURTH' + idx + ' ' + submit_dir + '/4.' + idx + '.submit')
             j4_list.append('FOURTH' + idx)
@@ -142,7 +150,7 @@ class Generator():
         # job2 retry
         job2_retry = ["Retry " + j2 + " 3" for j2 in j2_list]
         job4_retry = ["Retry " + j4 + " 3" for j4 in j4_list]
-	
+
         # job 5
         jobs.append('JOB FIFTH ' + submit_dir + '/5.0.submit')
         dependencies.append('PARENT ' + ' '.join(j4_list) + ' CHILD FIFTH')

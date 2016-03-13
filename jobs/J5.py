@@ -2,7 +2,7 @@
 # coding: utf-8
 
 # In[1]:
-
+from multiprocessing import Process
 import pandas as pd
 import os
 import numpy as np
@@ -11,8 +11,12 @@ import rpy2.robjects as robjects
 import time
 from rpy2.robjects.packages import importr
 import sys
+from glob import glob
 
 
+round_num = sys.argv[1]
+filePath = "data/" + round_num + "/J5condor/result/"
+os.makedirs(filePath)
 
 #new
 importr('plyr')
@@ -112,7 +116,6 @@ getGlobalScore_ch1 <- function(obs, pred) {
            final= primaryScoreCH1,
            tiebreak= tieBreakingScoreCH1))
 }
-
 ''')
 
 
@@ -127,12 +130,60 @@ df = pd.read_csv(basePath)
 for baseValue in df['baseline'] :
     baseline.append(baseValue)
 
+"""
 result = {}
 for i in range(10):
     result[i] = []
+"""
+
+def handle_single_set(set_idx, round_num):
+    file_paths = glob('J4condor/result/svm_result*_' + str(set_idx) + '.csv')
+    lines = []
+
+    for cvFileName in file_paths:
+        cvFileName_only_filename = cvFileName.split('/')[-1]
+
+        zz = cvFileName_only_filename.split("svm_result")[1].split(".csv")[0]
 
 
+        index = zz.split("_")[1]
+        deleteIndex = zz.split("_")[0]
+
+        testsetpath = "/home/ubuntu/data/answers/ch1_newtestset_wtest_"
+        trainDir = testsetpath + str(index)+".csv"#answerSewt
+        value = robjects.r['getGlobalScore_ch1'](trainDir,cvFileName)[1]
+
+        sunKyu_Value = value - baseline[int(index)]
+
+        """
+        l = result[int(index)]
+        l.append(str(deleteIndex)+","+str(sunKyu_Value))
+        result[int(index)] = l
+        """
+        lines.append( str(deleteIndex) + ',' +  str(sunKyu_Value) )
+
+    filePath = "data/" + round_num + "/J5condor/result/"
+    f = open(filePath+"result_"+str(set_idx)+".csv",'w')
+    f.write( '\n'.join(lines) )
+    """
+    for line in result[set_idx]:
+        f.write(line+"\n")
+        f.flush()
+    """
+    f.close()
+
+processes = list()
+for set_idx in range(10):
+    p = Process(target=handle_single_set, args=(set_idx,round_num))
+    processes.append(p)
+    p.start()
+
+for p in processes:
+    p.join()
+
+"""
 for root, dirs, files in os.walk(filePath):
+
     for fname in files:
 
         cvFileName = os.path.join(root, fname)
@@ -144,7 +195,6 @@ for root, dirs, files in os.walk(filePath):
         index = zz.split("_")[1]
         deleteIndex = zz.split("_")[0]
 
-
         testsetpath = "/home/ubuntu/data/answers/ch1_newtestset_wtest_"
         trainDir = testsetpath + str(index)+".csv"#answerSewt
         value = robjects.r['getGlobalScore_ch1'](trainDir,cvFileName)[1]
@@ -154,14 +204,12 @@ for root, dirs, files in os.walk(filePath):
         l = result[int(index)]
         l.append(str(deleteIndex)+","+str(sunKyu_Value))
         result[int(index)] = l
-
-
-round_num = sys.argv[1]
-filePath = "data/" + round_num + "/J5condor/result/"
-os.makedirs(filePath)
+"""
+"""
 for i in range(10):
     f = open(filePath+"result_"+str(i)+".csv",'w')
     for line in result[i]:
         f.write(line+"\n")
         f.flush()
     f.close()
+"""

@@ -1,6 +1,9 @@
-def params(round_num):
+def params(round_num, j1_type):
     if round_num == 0:
-        pastRound_bestC = 180
+        if j1_type == 'a':
+            pastRound_bestC = 180
+        else:
+            pastRound_bestC = 90
     else:
         src_file_path = '/'.join(['data', str(round_num-1), 'J3condor', 'result', 'parameter.csv'])
         f = open(src_file_path)
@@ -15,11 +18,11 @@ def params(round_num):
 
     c_list = range(pastRound_bestC - 20*6, pastRound_bestC + 20*6, 10)
     gamma_list = [x/1000.0 for x in range(1,100,20)]
-	
+
     values = [
             (c_value, gamma_value, dataset_num)
-            for c_value in c_list[-1:]
-            for gamma_value in gamma_list[-1:]
+            for c_value in c_list
+            for gamma_value in gamma_list
             for dataset_num in range(0,10)
             if c_value > 1
             ]
