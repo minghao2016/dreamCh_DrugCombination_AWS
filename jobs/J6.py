@@ -71,10 +71,30 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
             break
         main_count += 1
     resultDF_overThreshold = resultDF_sorted[resultDF_sorted["Count"] >= threshold]
-    resultDF_mean_overThreshold = resultDF_mean_sorted[resultDF_mean_sorted["Mean"] >= meanthreshold]
+    #resultDF_mean_overThreshold = resultDF_mean_sorted[resultDF_mean_sorted["Mean"] >= meanthreshold]
+    resultDF_mean_overThreshold = resultDF_mean_sorted
 
     resultDF_overThreshold= resultDF_overThreshold.append(resultDF_mean_overThreshold)
-    extractedColumnIndexList = list(resultDF_overThreshold.index[0:numberOfExcludedIndex])
+
+    total_feature_cnt = len(resultDF_overThreshold.index)
+    if int(total_feature_cnt)  == 0 :
+        extractedColumnIndexList = list()
+    else:
+        if total_feature_cnt > 200 :
+            numberOfExcludedIndex = float(total_feature_cnt) * 0.3
+        elif total_feature_cnt > 100 :
+            numberOfExcludedIndex = float(total_feature_cnt) * 0.2
+        else:
+            numberOfExcludedIndex = float(total_feature_cnt) * 0.1
+        """
+        if total_feature_cnt > 20 :
+            numberOfExcludedIndex = 2
+        else:
+            numberOfExcludedIndex = 1
+        """
+
+        extractedColumnIndexList = list(resultDF_overThreshold.index[0:int(numberOfExcludedIndex)])
+
 
     paths = extractedColumnIndexPath.split('/')
     target_dir = '/'.join(paths[:-1])
@@ -83,9 +103,6 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
     with open(extractedColumnIndexPath, "w") as fw:
         for v in extractedColumnIndexList:
             fw.write(str(v) + "\n")
-
-
-
 
     smtp_host = 'smtp.gmail.com'
     login, password = 'dmis.dreamchallenge@gmail.com', 'dmisinfos#1'

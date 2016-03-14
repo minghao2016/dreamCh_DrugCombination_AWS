@@ -5,10 +5,10 @@ def params(j1_type):
                 for p in range(294,1248) ## 294~1248
                 for q in range(0, 10)
                 ]
-    elif j1_type == 'b':
+    else:
         values = [
                 (p, q)
-                for p in range(294,881) ## 294~1248
+                for p in range(294,881) ## 294~881
                 for q in range(0, 10)
                 ]
 

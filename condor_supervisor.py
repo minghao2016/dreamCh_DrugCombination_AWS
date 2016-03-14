@@ -5,9 +5,11 @@ from JobGenerator.generator import Generator as Job_Generator
 from jobs import J1
 
 class Supervisor():
-    def __init__(self, round_num, j1_type):
+    def __init__(self, round_num, j1_type, problem_num):
         self.j1_type = j1_type
         self.round_num = int(round_num)
+        self.problem_num = problem_num
+
         self.command = {
                 'condor_submit': ['condor_submit'],
                 'condor_submit_dag': ['condor_submit_dag'],
@@ -17,7 +19,7 @@ class Supervisor():
                 }
         }
 
-        self.job_gen = Job_Generator(j1_type)
+        self.job_gen = Job_Generator(j1_type, problem_num)
         self.run_flag = False
 
     """
@@ -47,7 +49,7 @@ class Supervisor():
         self.send_result2email(removed_feature_cnt)
 
         # Step2 : Generate new condor submit according to target dir path
-        submit_file_path = self.generate_submit_form()
+        submit_file_path = self.generate_submit_form(removed_feature_cnt)
 
         # Step3 : submit condor job submit file
         print "#Execute Problem1." + self.j1_type
@@ -61,6 +63,7 @@ class Supervisor():
         #step1 : execute Job on locally
         print "job1 execute"
         removed_feature_cnt = J1.execute(self.round_num)
+        print "job1 finish"
 
         #step2 : distributing data
         call(['bash', 'uploader.sh', str(self.round_num)])
@@ -82,7 +85,7 @@ class Supervisor():
         dst_dir = '/'.join(['data', str(self.round_num), 'J6condor'])
         shutil.copytree(src_dir, dst_dir)
 
-    def generate_submit_form(self):
+    def generate_submit_form(self, removed_feature_cnt):
         self.job_gen.set_round_num(self.round_num)
 
         target_dir = '/'.join(['submit', str(self.round_num)])
@@ -91,7 +94,7 @@ class Supervisor():
         # TODO: clean below dirty code
         for job_num in range(2,7):
             if job_num == 2:
-                submit_content = self.job_gen.get_submit_content_job2()
+                submit_content = self.job_gen.get_submit_content_job2(removed_feature_cnt)
             elif job_num == 4:
                 submit_content = self.job_gen.get_submit_content_job4()
             else:
@@ -120,6 +123,7 @@ class Supervisor():
         if self.round_num != 0:
 
             content = [
+                    'in DMIS clusters',
                     'Problem 1.' + self.j1_type,
                     '#Round ' + str(self.round_num-1),
                     'removed feature cnt: ' + str(removed_feature_cnt)]
@@ -144,7 +148,8 @@ class Supervisor():
 
 
 if __name__ == '__main__':
-    supervisor = Supervisor(sys.argv[1], sys.argv[2])
+    # round number, data set type, problem num
+    supervisor = Supervisor(sys.argv[1], sys.argv[2], sys.argv[3])
 
     while True:
         if supervisor.exist_jobs('run'):
@@ -155,4 +160,4 @@ if __name__ == '__main__':
         else:
             supervisor.execute_new_cycle()
             time.sleep(10)
-    #supervisor.generate_submit_form()
+    #supervisor.generate_submit_form(800)

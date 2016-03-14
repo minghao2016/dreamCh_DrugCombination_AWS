@@ -4,8 +4,10 @@ from job4 import params as job4_param_gen
 
 
 class Generator():
-    def __init__(self, j1_type):
+    def __init__(self, j1_type, problem_num):
         self.j1_type = j1_type
+        self.problem_num = problem_num
+
         self.common = [
                 'universe = vanilla',
                 'should_transfer_files = IF_NEEDED',
@@ -53,8 +55,11 @@ class Generator():
                 config['requirements'],
                 'arguments = ' + ' '.join(arguments)]
 
+        """
         if job_num != 2 and job_num != 4:
             submit_form.append('\n'.join(self.log_paths))
+        """
+        submit_form.append('\n'.join(self.log_paths))
 
         if 'queue_num' in config:
             submit_form.append('queue ' + str(config['queue_num']))
@@ -81,6 +86,7 @@ class Generator():
     def rearrange_arguments(self, arguments):
         result = [arguments[0]]
         result.append(str(self.round_num))
+        result.append(str(self.problem_num))
 
         if len(arguments) > 1 :
             for val in arguments[1:]:
@@ -88,8 +94,8 @@ class Generator():
 
         return result
 
-    def get_submit_content_job2(self):
-        params = job2_param_gen(self.round_num, self.j1_type)
+    def get_submit_content_job2(self, removed_feature_cnt):
+        params = job2_param_gen(self.round_num, self.j1_type, removed_feature_cnt)
 
         contents = list()
 

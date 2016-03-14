@@ -18,9 +18,10 @@ import sklearn.neighbors as neigbors
 # filePath = "C:/Users/Jang/Desktop/pizza/"
 
 round_num = int(sys.argv[1])
-value1 = float(sys.argv[2])
-value2 = float(sys.argv[3])
-value4 = int(sys.argv[4])
+problem_num = sys.argv[2]
+value1 = float(sys.argv[3])
+value2 = float(sys.argv[4])
+value4 = int(sys.argv[5])
 
 
 def find_max_index(train_libfm, test_libfm):
@@ -72,9 +73,6 @@ def convertToSKlearnInput_withMaxIndex(libfmFile,maxIndex):
 
         return feature_list, synergy_list
 
-
-
-
 def convertToSKlearnInput(libfmFile):
     with open(libfmFile,'r') as r:
         synergy_list=[]
@@ -111,7 +109,7 @@ def convertToSKlearnInput(libfmFile):
 
 
 
-def run_sklearn(train_libfm, test_libfm,testPredCSV,testCSV , n_est=1000, lr=0.07, depth=7, maxindexBool=False):
+def run_sklearn(train_libfm, test_libfm,testPredCSV,testCSV , n_est=1000, lr=0.07, depth=7, maxindexBool=False, threshold=20):
     if maxindexBool==False:
         train_feature_list, train_synergy_list = convertToSKlearnInput(train_libfm)
         test_feature_list, test_synergy_list = convertToSKlearnInput(test_libfm)
@@ -130,16 +128,25 @@ def run_sklearn(train_libfm, test_libfm,testPredCSV,testCSV , n_est=1000, lr=0.0
     testDF = pd.read_csv(testCSV).loc[:,["CELL_LINE","COMBINATION_ID","SYNERGY_SCORE"]]
     testDF["SYNERGY_SCORE"]=pred
     testDF.columns = ["CELL_LINE","COMBINATION_ID","PREDICTION"]
-    testDF.to_csv(testPredCSV,index=False)
+
+    if problemNum=="2" :
+
+        pivoted_df = testDF.pivot(index='COMBINATION_ID',columns='CELL_LINE',values='PREDICTION')
+        filledpivoted_df = pivoted_df.fillna(0.0)
+        filledpivoted_df[filledpivoted_df<threshold] = 0
+        filledpivoted_df[filledpivoted_df>=threshold] = 1
+        filledpivoted_df.to_csv(testPredCSV)
+
+    else :
+        testDF.to_csv(testPredCSV,index=False)
 
 
-
-root_dir = "/home/ubuntu/data/" + str(round_num)
+root_dir = "/mina/data/" + str(round_num)
 os.makedirs("data/" + str(round_num) + "/J2condor/result/")
 run_sklearn(root_dir + "/J1condor/includeTestSamples_1a/set"+str(value4)+"/Train_single_new.libfm", # single train set
             root_dir + "/J1condor/includeTestSamples_1a/set"+str(value4)+"/Test_single_new.libfm", # single test set
             "data/" + str(round_num) + "/J2condor/result/svm_result"+str(value1)+"_"+str(value2)+"_"+str(value4)+".csv", # result file path
-            "/home/ubuntu/data/answers/ch1_newtestset_wtest_"+str(value4)+".csv", # answer set
+            "/mina/data/answers/ch1_newtestset_wtest_"+str(value4)+".csv", # answer set
             maxindexBool=True)
 """
 run_sklearn("J1condor/set"+str(value4)+"/Train_single_new.libfm", # single train set

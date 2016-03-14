@@ -19,8 +19,9 @@ featureFolderPath = "J6condor/result/" # TBD
 # filePath = "C:/Users/Jang/Desktop/pizza/"
 
 round_num = sys.argv[1]
-value1 = int(sys.argv[2])
-value4 = int(sys.argv[3])
+problemNum = sys.argv[2]
+value1 = int(sys.argv[3])
+value4 = int(sys.argv[4])
 
 def find_max_index(train_libfm, test_libfm):
     index_list = []
@@ -118,7 +119,7 @@ def get_params():
     return (float(params[0]), float(params[1]))
 
 
-def run_sklearn(train_libfm, test_libfm,testPredCSV,testCSV , n_est=1000, lr=0.07, depth=7, maxindexBool=True):
+def run_sklearn(train_libfm, test_libfm,testPredCSV,testCSV , n_est=1000, lr=0.07, depth=7, maxindexBool=True, threshold=20):
 
     if maxindexBool == True:
         max_index = find_max_index(train_libfm,test_libfm)
@@ -146,7 +147,16 @@ def run_sklearn(train_libfm, test_libfm,testPredCSV,testCSV , n_est=1000, lr=0.0
 
     testDF["SYNERGY_SCORE"]=pred
     testDF.columns = ["CELL_LINE","COMBINATION_ID","PREDICTION"]
-    testDF.to_csv(testPredCSV,index=False)
+
+    if problemNum=="2" :
+        pivoted_df = testDF.pivot(index='COMBINATION_ID',columns='CELL_LINE',values='PREDICTION')
+        filledpivoted_df = pivoted_df.fillna(0.0)
+        filledpivoted_df[filledpivoted_df<threshold] = 0
+        filledpivoted_df[filledpivoted_df>=threshold] = 1
+        filledpivoted_df.to_csv(testPredCSV)
+
+    else :
+        testDF.to_csv(testPredCSV,index=False)
 
 
 delfeatlist = []
@@ -159,13 +169,13 @@ for fn in os.listdir(featureFolderPath):
 if value1 in delfeatlist:
     os.makedirs('./data')
 else:
-    root_dir = "/home/ubuntu/data/" + str(round_num)
+    root_dir = "/mina/data/" + str(round_num)
 
     os.makedirs("data/" + str(round_num) + "/J4condor/result/")
     run_sklearn(root_dir + "/J1condor/includeTestSamples_1a/set"+str(value4)+"/Train_single_new.libfm", # single train set
                 root_dir + "/J1condor/includeTestSamples_1a/set"+str(value4)+"/Test_single_new.libfm", # single test set
                 "data/" + str(round_num) + "/J4condor/result/svm_result"+str(value1)+"_"+str(value4)+".csv",
-                "/home/ubuntu/data/answers/ch1_newtestset_wtest_"+str(value4)+".csv", # answer set
+                "/mina/data/answers/ch1_newtestset_wtest_"+str(value4)+".csv", # answer set
                 #dellist,
                 1000, 0.07, 7, True)
 """
