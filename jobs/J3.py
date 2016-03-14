@@ -159,7 +159,6 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
       pred <- as.matrix(pred)
       return(pred)
     }
-    ​
     # ------------------------------------------------------------------------------------
     # Get unsigned score from one dimensional ANOVA
     # ------------------------------------------------------------------------------------
@@ -180,11 +179,9 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
       pred <- getPred_ch2(pred)
       pred <- pred[match(row.names(obs),row.names(pred)),]
       pred <- pred[,match(colnames(obs),colnames(pred))]
-    ​
       #Remove all NA's
       pred <- as.numeric(pred)[!is.na(obs)]
       obs <- as.numeric(obs)[!is.na(obs)]
-    ​
       preds <- prediction(pred,obs)
       prec <- performance(preds,"prec") #precision (Acc + )
       sens <- performance(preds,"sens") #True positive rate (Sensitivity) (Cov +)
@@ -226,9 +223,7 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
                      BAC=BAC, # Tie breaking Metric
                      F1=F1,
                      aupr=aupr_val),2))
-    ​
     }
-    ​
     # ------------------------------------------------------------------------------------
     # Get the drug combinations score of Subchallenge 2
     # ------------------------------------------------------------------------------------
@@ -240,7 +235,6 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
       pred <- getPred_ch2(pred)
       pred <- pred[match(row.names(obs),row.names(pred)),]
       pred <- pred[,match(colnames(obs),colnames(pred))]
-    ​
       n <- ncol(obs)
       if (rows)
         n <- nrow(obs)
@@ -292,7 +286,6 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
       return(round(c(mean=mean(boot_score/nStep),
                      ste=sd(boot_score/nStep)),2))
     }
-    ​
     # ------------------------------------------------------------------------------------
     # Get the performance score of Subchallenge 2
     # ------------------------------------------------------------------------------------
@@ -304,7 +297,6 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
       pred <- getPred_ch2(pred)
       pred <- pred[match(row.names(obs),row.names(pred)),]
       pred <- pred[,match(colnames(obs),colnames(pred))]
-    ​
       # regress out combination bias
       cov <- rep(rownames(obs), ncol(obs))
 
@@ -321,13 +313,11 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
 
       if(all(pred==0) | all(pred==1))
         return(0)
-    ​
       # run anove with combination label as covariate
       fit <- aov(obs ~ c0 + c1 + pred)
       pVal <- -log10(anova(fit)['pred','Pr(>F)'])
 
       sign <- 1
-    ​
       if (sum(!is.na(obs[pred==1])) >0  && sum(!is.na(obs[pred==0]))>0)
         if (mean(obs[pred==1], na.rm=T) < mean(obs[pred==0], na.rm=T))
           sign <- -1
@@ -394,7 +384,7 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
 
 # This is an example of inputs and outputs
 if __name__ == '__main__':
-    testsetpath = "/mina/data/answers/ch1_newtestset_wtest_"
+    testsetpath = "/home/ubuntu/data/answers/ch1_newtestset_wtest_"
     testsetList = []
     for i in range(10):
         testsetList.append(testsetpath+str(i)+".csv")

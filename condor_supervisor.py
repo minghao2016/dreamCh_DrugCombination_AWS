@@ -44,12 +44,12 @@ class Supervisor():
             self.move_J1data()
 
         # execute J1
-        removed_feature_cnt = self.execute_job1_distribute_data()
+        removed_feature_indexes = self.execute_job1_distribute_data()
         # send previous baseline and remove feature cnt
-        self.send_result2email(removed_feature_cnt)
+        self.send_result2email(len(removed_feature_indexes))
 
         # Step2 : Generate new condor submit according to target dir path
-        submit_file_path = self.generate_submit_form(removed_feature_cnt)
+        submit_file_path = self.generate_submit_form(removed_feature_indexes)
 
         # Step3 : submit condor job submit file
         print "#Execute Problem1." + self.j1_type
@@ -62,13 +62,13 @@ class Supervisor():
     def execute_job1_distribute_data(self):
         #step1 : execute Job on locally
         print "job1 execute"
-        removed_feature_cnt = J1.execute(self.round_num)
+        removed_feature_indexes = J1.execute(self.round_num)
         print "job1 finish"
 
         #step2 : distributing data
         call(['bash', 'uploader.sh', str(self.round_num)])
 
-        return removed_feature_cnt
+        return removed_feature_indexes
 
     def move_J1data(self):
         src_dir = '/'.join(['data', str(self.round_num-1), 'J1condor'])
@@ -85,7 +85,7 @@ class Supervisor():
         dst_dir = '/'.join(['data', str(self.round_num), 'J6condor'])
         shutil.copytree(src_dir, dst_dir)
 
-    def generate_submit_form(self, removed_feature_cnt):
+    def generate_submit_form(self, removed_feature_indexes):
         self.job_gen.set_round_num(self.round_num)
 
         target_dir = '/'.join(['submit', str(self.round_num)])
@@ -94,9 +94,10 @@ class Supervisor():
         # TODO: clean below dirty code
         for job_num in range(2,7):
             if job_num == 2:
-                submit_content = self.job_gen.get_submit_content_job2(removed_feature_cnt)
+                submit_content = self.job_gen.get_submit_content_job2(len(removed_feature_indexes))
             elif job_num == 4:
-                submit_content = self.job_gen.get_submit_content_job4()
+                submit_content = self.job_gen.get_submit_content_job4(removed_feature_indexes)
+                job4_size = len(submit_content)
             else:
                 submit_content = [self.job_gen.get_submit_content(job_num)]
 
@@ -107,7 +108,7 @@ class Supervisor():
                 f.write(submit_content[proc_num])
                 f.close()
 
-        dag_content = self.job_gen.get_dagman_content(self.round_num)
+        dag_content = self.job_gen.get_dagman_content(self.round_num, job4_size)
         f = open('/'.join([target_dir, 'DAGman.' + str(self.round_num) + '.dag']), 'a')
         f.write(dag_content)
         f.close()
@@ -150,7 +151,6 @@ class Supervisor():
 if __name__ == '__main__':
     # round number, data set type, problem num
     supervisor = Supervisor(sys.argv[1], sys.argv[2], sys.argv[3])
-
     while True:
         if supervisor.exist_jobs('run'):
             #TODO: nothing to do
@@ -160,4 +160,4 @@ if __name__ == '__main__':
         else:
             supervisor.execute_new_cycle()
             time.sleep(10)
-    #supervisor.generate_submit_form(800)
+    #supervisor.generate_submit_form(range(294,600))

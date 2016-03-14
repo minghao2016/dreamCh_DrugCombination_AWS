@@ -26,10 +26,16 @@ def params(round_num, j1_type, excluded_feature_cnt):
         c_list = [pbc - 100, pbc - 50, pbc - 20, pbc, pbc + 20, pbc + 50, pbc + 100]
     elif remain_feature_cnt > 80:
         c_list = [pbc - 60, pbc - 30, pbc - 10, pbc, pbc + 10, pbc + 30, pbc + 60]
+    elif remain_feature_cnt <= 0 :
+        c_list = range(60 , 400, 10)
     else :
         c_list = [pbc - 40, pbc - 20, pbc - 10, pbc, pbc + 10, pbc + 20, pbc + 40]
 
-    gamma_list = [0.061]
+
+    if remain_feature_cnt <= 0 :
+        gamma_list = [x/1000.0 for x in range(1,100,10)]
+    else:
+        gamma_list = [0.061]
     #c_list = range(pastRound_bestC - 20*6, pastRound_bestC + 20*6, 20)
     #gamma_list = [x/1000.0 for x in range(1,100,20)]
     #gamma_list = [x/1000.0 for x in range(1,100,20)]

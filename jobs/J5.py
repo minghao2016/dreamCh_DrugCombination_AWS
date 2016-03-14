@@ -153,7 +153,6 @@ getPred_ch2 <- function(pred) {
   pred <- as.matrix(pred)
   return(pred)
 }
-​
 # ------------------------------------------------------------------------------------
 # Get unsigned score from one dimensional ANOVA
 # ------------------------------------------------------------------------------------
@@ -174,11 +173,9 @@ getPrecision_ch2 <- function(obs_path, pred, threshold=30) {
   pred <- getPred_ch2(pred)
   pred <- pred[match(row.names(obs),row.names(pred)),]
   pred <- pred[,match(colnames(obs),colnames(pred))]
-​
   #Remove all NA's
   pred <- as.numeric(pred)[!is.na(obs)]
   obs <- as.numeric(obs)[!is.na(obs)]
-​
   preds <- prediction(pred,obs)
   prec <- performance(preds,"prec") #precision (Acc + )
   sens <- performance(preds,"sens") #True positive rate (Sensitivity) (Cov +)
@@ -220,9 +217,7 @@ getPrecision_ch2 <- function(obs_path, pred, threshold=30) {
                  BAC=BAC, # Tie breaking Metric
                  F1=F1,
                  aupr=aupr_val),2))
-​
 }
-​
 # ------------------------------------------------------------------------------------
 # Get the drug combinations score of Subchallenge 2
 # ------------------------------------------------------------------------------------
@@ -234,7 +229,6 @@ getOneDimScore_ch2 <- function(obs_path, pred, confidence="none", topX=10, rows=
   pred <- getPred_ch2(pred)
   pred <- pred[match(row.names(obs),row.names(pred)),]
   pred <- pred[,match(colnames(obs),colnames(pred))]
-​
   n <- ncol(obs)
   if (rows)
     n <- nrow(obs)
@@ -286,7 +280,6 @@ getOneDimScore_ch2 <- function(obs_path, pred, confidence="none", topX=10, rows=
   return(round(c(mean=mean(boot_score/nStep),
                  ste=sd(boot_score/nStep)),2))
 }
-​
 # ------------------------------------------------------------------------------------
 # Get the performance score of Subchallenge 2
 # ------------------------------------------------------------------------------------
@@ -298,7 +291,6 @@ getGlobalScore_ch2 <- function(obs_path, pred) {
   pred <- getPred_ch2(pred)
   pred <- pred[match(row.names(obs),row.names(pred)),]
   pred <- pred[,match(colnames(obs),colnames(pred))]
-​
   # regress out combination bias
   cov <- rep(rownames(obs), ncol(obs))
 
@@ -315,13 +307,11 @@ getGlobalScore_ch2 <- function(obs_path, pred) {
 
   if(all(pred==0) | all(pred==1))
     return(0)
-​
   # run anove with combination label as covariate
   fit <- aov(obs ~ c0 + c1 + pred)
   pVal <- -log10(anova(fit)['pred','Pr(>F)'])
 
   sign <- 1
-​
   if (sum(!is.na(obs[pred==1])) >0  && sum(!is.na(obs[pred==0]))>0)
     if (mean(obs[pred==1], na.rm=T) < mean(obs[pred==0], na.rm=T))
       sign <- -1
@@ -361,7 +351,7 @@ def handle_single_set(set_idx, round_num):
         index = zz.split("_")[1]
         deleteIndex = zz.split("_")[0]
 
-        testsetpath = "/mina/data/answers/ch1_newtestset_wtest_"
+        testsetpath = "/home/ubuntu/data/answers/ch1_newtestset_wtest_"
         trainDir = testsetpath + str(index)+".csv"#answerSewt
 
         if problemNum == "2" :

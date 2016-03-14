@@ -77,13 +77,16 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
     resultDF_overThreshold= resultDF_overThreshold.append(resultDF_mean_overThreshold)
 
     total_feature_cnt = len(resultDF_overThreshold.index)
-    if int(total_feature_cnt)  == 0 :
+
+    if int(total_feature_cnt) <= 30 :
         extractedColumnIndexList = list()
     else:
-        if total_feature_cnt > 200 :
+        if total_feature_cnt > 300 :
             numberOfExcludedIndex = float(total_feature_cnt) * 0.3
-        elif total_feature_cnt > 100 :
+        elif total_feature_cnt > 200 :
             numberOfExcludedIndex = float(total_feature_cnt) * 0.2
+        elif total_feature_cnt > 100 :
+            numberOfExcludedIndex = float(total_feature_cnt) * 0.15
         else:
             numberOfExcludedIndex = float(total_feature_cnt) * 0.1
         """
@@ -92,6 +95,9 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
         else:
             numberOfExcludedIndex = 1
         """
+
+        if numberOfExcludedIndex < 1 :
+            numberOfExcludedIndex = 1.0
 
         extractedColumnIndexList = list(resultDF_overThreshold.index[0:int(numberOfExcludedIndex)])
 

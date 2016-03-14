@@ -166,18 +166,21 @@ for fn in os.listdir(featureFolderPath):
         delfeatlist.append((int)(l.strip()))
     f.close()
 
+
 if value1 in delfeatlist:
     os.makedirs('./data')
 else:
-    root_dir = "/mina/data/" + str(round_num)
+    root_dir = "/home/ubuntu/data/" + str(round_num)
 
     os.makedirs("data/" + str(round_num) + "/J4condor/result/")
     run_sklearn(root_dir + "/J1condor/includeTestSamples_1a/set"+str(value4)+"/Train_single_new.libfm", # single train set
                 root_dir + "/J1condor/includeTestSamples_1a/set"+str(value4)+"/Test_single_new.libfm", # single test set
                 "data/" + str(round_num) + "/J4condor/result/svm_result"+str(value1)+"_"+str(value4)+".csv",
-                "/mina/data/answers/ch1_newtestset_wtest_"+str(value4)+".csv", # answer set
+                "/home/ubuntu/data/answers/ch1_newtestset_wtest_"+str(value4)+".csv", # answer set
                 #dellist,
                 1000, 0.07, 7, True)
+
+
 """
 run_sklearn("J1condor/set"+str(value4)+"/Train_single_new.libfm", # single train set
             "J1condor/set"+str(value4)+"/Test_single_new.libfm", # single test set

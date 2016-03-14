@@ -75,7 +75,7 @@ def execute(round_num):
     f.write('\n'.join([ str(val) for val in droplines ]))
     f.close()
 
-    return len(droplinesSet)
+    return droplinesSet
 
     #`call(["bash", "uploader.sh"])
 

@@ -104,17 +104,19 @@ class Generator():
             contents.append(self.get_submit_content(2))
         return contents
 
-    def get_submit_content_job4(self):
+    def get_submit_content_job4(self, removed_feature_indexes):
         params = job4_param_gen(self.j1_type)
 
         contents = list()
 
         for p, q in params:
+            if int(p) in removed_feature_indexes:
+                continue
             self.config[4]['arguments'] = ['J4.py', str(p), str(q)]
             contents.append(self.get_submit_content(4))
         return contents
 
-    def get_dagman_content(self, round_num):
+    def get_dagman_content(self, round_num, job4_size):
         round_num = str(round_num)
 
         submit_dir = '/'.join(['submit', round_num])
@@ -142,10 +144,12 @@ class Generator():
         dependencies.append('PARENT ' + ' '.join(j2_list) + ' CHILD THIRD')
         # job4
         j4_list = list()
+        """
         if self.j1_type == 'a':
             job4_size = 9540
         else:
             job4_size = 5870
+        """
 
         for job4_idx in range(job4_size):
             idx = str(job4_idx)
@@ -164,4 +168,4 @@ class Generator():
         #job6
         jobs.append('JOB SIXTH ' + submit_dir + '/6.0.submit')
         dependencies.append('PARENT FIFTH  CHILD SIXTH')
-        return '\n'.join(['\n'.join(jobs),'\n'.join(dependencies), '\n'.join(job2_retry), '\n'.join(job4_retry)])
+        return '\n'.join(['\n'.join(jobs),'\n'.join(dependencies)])
