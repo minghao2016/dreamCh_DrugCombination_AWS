@@ -76,7 +76,9 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
 
     resultDF_overThreshold= resultDF_overThreshold.append(resultDF_mean_overThreshold)
 
-    total_feature_cnt = len(resultDF_overThreshold.index)
+    #total_feature_cnt = len(resultDF_overThreshold.index)
+    # TODO:
+    total_feature_cnt = len(resultDF_overThreshold.index.unique())
 
     if int(total_feature_cnt) <= 30 :
         extractedColumnIndexList = list()
@@ -120,7 +122,7 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
             'leeheewon78@gmail.com',
             'kangj@korea.ac.kr',
             'minhwan90@gmail.com']
-    contents = "#removed: " + str(len(extractedColumnIndexList)) + "\n\n" + contents
+    contents = "In AWS Cluster\n\n#removed: " + str(len(extractedColumnIndexList)) + "\n\n" + contents
 
     msg = MIMEText(contents, 'plain', 'utf-8')
     msg['Subject'] = Header('J6 Result', 'utf-8')

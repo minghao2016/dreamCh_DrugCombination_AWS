@@ -55,10 +55,9 @@ class Generator():
                 config['requirements'],
                 'arguments = ' + ' '.join(arguments)]
 
-        """
         if job_num != 2 and job_num != 4:
             submit_form.append('\n'.join(self.log_paths))
-        """
+
         submit_form.append('\n'.join(self.log_paths))
 
         if 'queue_num' in config:

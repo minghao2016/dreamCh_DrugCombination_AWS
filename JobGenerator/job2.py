@@ -19,13 +19,13 @@ def params(round_num, j1_type, excluded_feature_cnt):
     pbc = pastRound_bestC
 
     if remain_feature_cnt > 500 :
-        c_list = [pbc - 200, pbc - 120, pbc - 60, pbc, pbc + 60, pbc + 120, pbc + 200]
+        c_list = [pbc - 200, pbc - 120, pbc - 60, pbc - 30,  pbc, pbc + 30, pbc + 60, pbc + 120, pbc + 200]
     elif remain_feature_cnt > 300 :
-        c_list = [pbc - 150, pbc - 80, pbc - 40, pbc, pbc + 40, pbc + 80, pbc + 150]
+        c_list = [pbc - 150, pbc - 80, pbc - 50, pbc - 20, pbc, pbc + 20, pbc + 50, pbc + 80, pbc + 150]
     elif remain_feature_cnt > 150:
-        c_list = [pbc - 100, pbc - 50, pbc - 20, pbc, pbc + 20, pbc + 50, pbc + 100]
+        c_list = [pbc - 100, pbc - 60, pbc - 30, pbc - 10, pbc, pbc + 10, pbc + 30, pbc + 60, pbc + 100]
     elif remain_feature_cnt > 80:
-        c_list = [pbc - 60, pbc - 30, pbc - 10, pbc, pbc + 10, pbc + 30, pbc + 60]
+        c_list = [pbc - 60, pbc - 40, pbc - 20, pbc - 10 , pbc, pbc + 10, pbc + 20, pbc + 40, pbc + 60]
     elif remain_feature_cnt <= 0 :
         c_list = range(60 , 400, 10)
     else :

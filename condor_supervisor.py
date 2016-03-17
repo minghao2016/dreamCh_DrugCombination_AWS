@@ -124,10 +124,10 @@ class Supervisor():
         if self.round_num != 0:
 
             content = [
-                    'in DMIS clusters',
-                    'Problem 1.' + self.j1_type,
+                    'Problem ' + self.problem_num + '.' + self.j1_type,
                     '#Round ' + str(self.round_num-1),
-                    'removed feature cnt: ' + str(removed_feature_cnt)]
+
+                    'removed feature cnt: ' + str(removed_feature_cnt) + ' in next Round']
 
             value_sum = .0
             f = open('/'.join(['data', str(self.round_num-1), 'J3condor', 'result', 'baseline.csv']))
