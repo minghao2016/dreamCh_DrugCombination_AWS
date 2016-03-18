@@ -368,6 +368,7 @@ def handle_single_set(set_idx, round_num):
         else :
             value = robjects.r['getGlobalScore_ch1'](trainDir,cvFileName)[1]
 
+        value = get_mse(trainDir, cvFileName)
         sunKyu_Value = value - baseline[int(index)]
 
         """
