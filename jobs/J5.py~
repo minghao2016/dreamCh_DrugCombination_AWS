@@ -17,14 +17,6 @@ from glob import glob
 round_num = sys.argv[1]
 problemNum = sys.argv[2]
 
-def get_mse(obs, pred):
-    obs_df=pd.read_csv(obs)
-    pred_df=pd.read_csv(pred)
-    mse = mean_squared_error(obs_df["SYNERGY_SCORE"],pred_df["PREDICTION"])
-    return mse
-
-
-
 filePath = "data/" + round_num + "/J5condor/result/"
 os.makedirs(filePath)
 

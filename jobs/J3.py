@@ -9,6 +9,7 @@ from rpy2.robjects.packages import importr
 import sys
 import numpy as np
 import glob
+from sklearn.metrics import mean_squared_error
 
 # input
 # resultFilePath: absolute path of the folder that result file exists
@@ -19,6 +20,12 @@ import glob
 
 round_num = sys.argv[1]
 problemNum = sys.argv[2]
+
+def get_mse(obs, pred):
+    obs_df=pd.read_csv(obs)
+    pred_df=pd.read_csv(pred)
+    mse = mean_squared_error(obs_df["SYNERGY_SCORE"],pred_df["PREDICTION"])
+    return mse
 
 def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
     if not os.path.isdir("data/" + round_num + "/J3condor"):
@@ -287,7 +294,7 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
                      ste=sd(boot_score/nStep)),2))
     }
     # ------------------------------------------------------------------------------------
-    # Get the performance score of Subchallenge 2
+    # Get the performance score//aa of Subchallenge 2
     # ------------------------------------------------------------------------------------
     getGlobalScore_ch2 <- function(obs_path, pred) {
       obs <- read.csv(obs_path)
@@ -348,12 +355,22 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
         else :
             value = robjects.r['getGlobalScore_ch1'](trainDir, fname)[1]
 
+        mse = get_mse(trainDir, fname)
+
+        """
         if C+"_"+Gamma not in valuedict:
             valuedict[C+"_"+Gamma] = []
         l = valuedict[C+"_"+Gamma]
         l.append(value)
         valuedict[C+"_"+Gamma] = l
         indexvaluedict[C+"_"+Gamma+"_"+Index] = value
+        """
+        if C+"_"+Gamma not in valuedict:
+            valuedict[C+"_"+Gamma] = []
+        l = valuedict[C+"_"+Gamma]
+        l.append(mse)
+        valuedict[C+"_"+Gamma] = l
+        indexvaluedict[C+"_"+Gamma+"_"+Index] = mse
 
     maxparam = "0.0_0.0"
     maxvalue = -1
