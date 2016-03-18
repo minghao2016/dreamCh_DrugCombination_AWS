@@ -28,8 +28,9 @@ class Supervisor():
     def exist_jobs(self, q_type):
         jobs = check_output(self.command['condor_q'][q_type])
 
-        lines = jobs.strip().split('\n')
-        if len(lines) > 1:
+        #lines = jobs.strip().split('\n')
+
+        if 'ubuntu' in jobs:
             return True
         else:
             return False
@@ -73,12 +74,7 @@ class Supervisor():
     def move_J1data(self):
         src_dir = '/'.join(['data', str(self.round_num-1), 'J1condor'])
         dst_dir = '/'.join(['data', str(self.round_num), 'J1condor'])
-        try:
-            shutil.copytree(src_dir, dst_dir)
-        except OSError:
-            print 'retry ', str(self.round_num)
-            self.round_num += 1
-            move_J1data()
+        shutil.copytree(src_dir, dst_dir)
 
     def move_J6data(self):
         src_dir = '/'.join(['data', str(self.round_num-1), 'J6condor'])
@@ -116,7 +112,7 @@ class Supervisor():
         return target_dir
 
     def send_submit_form(self, submit_dir_path):
-        call(['condor_submit_dag', '-maxidle','1000',submit_dir_path + '/DAGman.' + str(self.round_num) + '.dag'])
+        call(['condor_submit_dag',submit_dir_path + '/DAGman.' + str(self.round_num) + '.dag'])
 
         time.sleep(60)
 
@@ -124,7 +120,7 @@ class Supervisor():
         if self.round_num != 0:
 
             content = [
-                    'Problem ' + self.problem_num + '.' + self.j1_type,
+                    '::MSE metric::\nProblem ' + self.problem_num + '.' + self.j1_type,
                     'initial removed : 801',
                     '#Round ' + str(self.round_num-1),
 
@@ -158,7 +154,9 @@ if __name__ == '__main__':
             pass
         elif supervisor.exist_jobs('held'):
             email_sender.send("Job held!!!")
+            sys.exit()
         else:
             supervisor.execute_new_cycle()
             time.sleep(10)
     #supervisor.generate_submit_form(range(294,600))
+    #print supervisor.exist_jobs('run')

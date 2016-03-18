@@ -40,11 +40,10 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
         countList.append(count)
 
     resultDF = pd.DataFrame({"Mean":meanList, "Count":countList}, index=indexList)
-    resultDF_sorted = resultDF.sort_values(["Count", "Mean"], ascending=False)
-
+    #resultDF_sorted = resultDF.sort_values(["Count", "Mean"], ascending=False)
+    resultDF_sorted = resultDF.sort_values(["Mean"], ascending=False)
 
     resultDF_mean_sorted = resultDF.sort_values(["Mean"], ascending=False)
-
 
     contents = "Top 20% in Round #" + round_num + "\n"
     mainContentNumber = int(len(resultDF_sorted.index) * 0.2)
@@ -62,7 +61,8 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
     contents += "Bottom 20%\n"
 
     main_count = 0
-    resultDF_sorted_ascending = resultDF.sort_values(["Count", "Mean"], ascending=True)
+    #resultDF_sorted_ascending = resultDF.sort_values(["Count", "Mean"], ascending=True)
+    resultDF_sorted_ascending = resultDF.sort_values(["Mean"], ascending=True)
     for t in resultDF_sorted_ascending.itertuples():
         for v in t:
             contents += str(v) + " "
@@ -70,7 +70,9 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
         if main_count == mainContentNumber:
             break
         main_count += 1
-    resultDF_overThreshold = resultDF_sorted[resultDF_sorted["Count"] >= threshold]
+
+    #resultDF_overThreshold = resultDF_sorted[resultDF_sorted["Count"] >= threshold]
+    resultDF_overThreshold = resultDF_sorted
     #resultDF_mean_overThreshold = resultDF_mean_sorted[resultDF_mean_sorted["Mean"] >= meanthreshold]
     resultDF_mean_overThreshold = resultDF_mean_sorted
 
@@ -84,11 +86,11 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
         extractedColumnIndexList = list()
     else:
         if total_feature_cnt > 300 :
-            numberOfExcludedIndex = float(total_feature_cnt) * 0.3
-        elif total_feature_cnt > 200 :
             numberOfExcludedIndex = float(total_feature_cnt) * 0.2
+        elif total_feature_cnt > 200 :
+            numberOfExcludedIndex = float(total_feature_cnt) * 0.1
         elif total_feature_cnt > 100 :
-            numberOfExcludedIndex = float(total_feature_cnt) * 0.15
+            numberOfExcludedIndex = float(total_feature_cnt) * 0.1
         else:
             numberOfExcludedIndex = float(total_feature_cnt) * 0.1
         """
@@ -101,7 +103,7 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
         if numberOfExcludedIndex < 1 :
             numberOfExcludedIndex = 1.0
 
-        extractedColumnIndexList = list(resultDF_overThreshold.index[-1 * int(numberOfExcludedIndex):])
+        extractedColumnIndexList = list(resultDF_overThreshold.index[:int(numberOfExcludedIndex)])
 
 
     paths = extractedColumnIndexPath.split('/')
@@ -112,7 +114,6 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
         for v in extractedColumnIndexList:
             fw.write(str(v) + "\n")
 
-    """
     smtp_host = 'smtp.gmail.com'
     login, password = 'dmis.dreamchallenge@gmail.com', 'dmisinfos#1'
 
@@ -123,7 +124,7 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
             'leeheewon78@gmail.com',
             'kangj@korea.ac.kr',
             'minhwan90@gmail.com']
-    contents = "In AWS Cluster\n\n#removed: " + str(len(extractedColumnIndexList)) + "\n\n" + contents
+    contents = "::MSE metric::\n\n#removed: " + str(len(extractedColumnIndexList)) + "\n\n" + contents
 
     msg = MIMEText(contents, 'plain', 'utf-8')
     msg['Subject'] = Header('J6 Result', 'utf-8')
@@ -137,7 +138,6 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
         s.sendmail(msg['From'], recipients_emails, msg.as_string())
     finally:
         s.quit()
-    """
     return len(extractedColumnIndexList)
 
 if __name__ == '__main__':
