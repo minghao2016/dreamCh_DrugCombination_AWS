@@ -112,6 +112,7 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
         for v in extractedColumnIndexList:
             fw.write(str(v) + "\n")
 
+    """
     smtp_host = 'smtp.gmail.com'
     login, password = 'dmis.dreamchallenge@gmail.com', 'dmisinfos#1'
 
@@ -136,7 +137,7 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
         s.sendmail(msg['From'], recipients_emails, msg.as_string())
     finally:
         s.quit()
-
+    """
     return len(extractedColumnIndexList)
 
 if __name__ == '__main__':

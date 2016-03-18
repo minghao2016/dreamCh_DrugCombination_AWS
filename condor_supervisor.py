@@ -125,6 +125,7 @@ class Supervisor():
 
             content = [
                     'Problem ' + self.problem_num + '.' + self.j1_type,
+                    'initial removed : 801',
                     '#Round ' + str(self.round_num-1),
 
                     'removed feature cnt: ' + str(removed_feature_cnt) + ' in next Round']
