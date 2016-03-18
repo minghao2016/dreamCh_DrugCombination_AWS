@@ -337,6 +337,9 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
     valuedict = {}
     indexvaluedict = {}
 
+    valuedict_mse = {}
+    indexvaluedict_mse = {}
+
     for fname in glob.glob(resultFilePath+"*.csv"):
         print fname
         only_filename = fname.replace('\\','/').split('/')[-1]
@@ -355,26 +358,27 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
         else :
             value = robjects.r['getGlobalScore_ch1'](trainDir, fname)[1]
 
-        mse = get_mse(trainDir, fname)
 
-        """
         if C+"_"+Gamma not in valuedict:
             valuedict[C+"_"+Gamma] = []
         l = valuedict[C+"_"+Gamma]
         l.append(value)
         valuedict[C+"_"+Gamma] = l
         indexvaluedict[C+"_"+Gamma+"_"+Index] = value
-        """
-        if C+"_"+Gamma not in valuedict:
-            valuedict[C+"_"+Gamma] = []
-        l = valuedict[C+"_"+Gamma]
+
+        mse = get_mse(trainDir, fname)
+        if C+"_"+Gamma not in valuedict_mse:
+            valuedict_mse[C+"_"+Gamma] = []
+        l = valuedict_mse[C+"_"+Gamma]
         l.append(mse)
-        valuedict[C+"_"+Gamma] = l
-        indexvaluedict[C+"_"+Gamma+"_"+Index] = mse
+        valuedict_mse[C+"_"+Gamma] = l
+        indexvaluedict_mse[C+"_"+Gamma+"_"+Index] = mse
 
     maxparam = "0.0_0.0"
     maxvalue = -1
 
+
+    # correlation
     for key in valuedict:
         meanvalue = np.mean(valuedict[key])
         if maxvalue < meanvalue:
@@ -383,17 +387,47 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
     finalC = maxparam.split("_")[0]
     finalGamma = maxparam.split("_")[1]
     valuelist = []
+
     for i in range(10):
         valuelist.append(indexvaluedict[maxparam+"_"+str(i)])
 
-    f = open(paramPath,'w')
+
+    # mse
+    minparam = "0.0_0.0"
+    minvalue = 1000000
+    for key in valuedict:
+        meanvalue = np.mean(valuedict_mse[key])
+        if minvalue >  meanvalue:
+            minparam = key
+            minvalue = meanvalue
+    finalC_mse = minparam.split("_")[0]
+    finalGamma_mse = minparam.split("_")[1]
+    valuelist_mse = []
+
+    for i in range(10):
+        valuelist_mse.append(indexvaluedict_mse[maxparam+"_"+str(i)])
+
+    # correlation
+    f = open(paramPath + '.corr','w')
     f.write("C,Gamma\n"+finalC+","+finalGamma+"\n")
+    f.flush()
+    f.close()
+    f = open(baselinePath + '.corr' , "w")
+    f.write("index,baseline\n")
+    for i in range(10):
+        f.write(str(i)+","+str(valuelist[i])+'\n')
+        f.flush()
+    f.close()
+
+    # mse
+    f = open(paramPath,'w')
+    f.write("C,Gamma\n"+finalC_mse+","+finalGamma_mse+"\n")
     f.flush()
     f.close()
     f = open(baselinePath, "w")
     f.write("index,baseline\n")
     for i in range(10):
-        f.write(str(i)+","+str(valuelist[i])+'\n')
+        f.write(str(i)+","+str(valuelist_mse[i])+'\n')
         f.flush()
     f.close()
 

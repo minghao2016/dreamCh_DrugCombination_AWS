@@ -101,7 +101,7 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
         if numberOfExcludedIndex < 1 :
             numberOfExcludedIndex = 1.0
 
-        extractedColumnIndexList = list(resultDF_overThreshold.index[0:int(numberOfExcludedIndex)])
+        extractedColumnIndexList = list(resultDF_overThreshold.index[-1 * int(numberOfExcludedIndex):])
 
 
     paths = extractedColumnIndexPath.split('/')

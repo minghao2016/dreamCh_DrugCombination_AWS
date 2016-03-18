@@ -13,9 +13,8 @@ import email_sender
 
 #defaultTestlibfm = "includeTest_single_2.libfm"
 #defaultTrainlibfm = "includeTrain_single_2.libfm"
-
-defaultTestlibfm = "includeTest_single_1a_expanded.libfm"
-defaultTrainlibfm = "includeTrain_single_1a_expanded.libfm"
+defaultTestlibfm = "excludeTest_single_1a_expanded.libfm"
+defaultTrainlibfm = "excludeTrain_single_1a_expanded.libfm"
 # defaultTrainlibfm = sys.argv[0]
 # defaultTestlibfm = sys.argv[1]
 
