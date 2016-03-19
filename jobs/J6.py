@@ -82,13 +82,13 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
     # TODO:
     total_feature_cnt = len(resultDF_overThreshold.index.unique())
 
-    if int(total_feature_cnt) <= 30 :
+    if int(total_feature_cnt) <= 50 :
         extractedColumnIndexList = list()
     else:
         if total_feature_cnt > 300 :
             numberOfExcludedIndex = float(total_feature_cnt) * 0.2
         elif total_feature_cnt > 200 :
-            numberOfExcludedIndex = float(total_feature_cnt) * 0.1
+            numberOfExcludedIndex = float(total_feature_cnt) * 0.15
         elif total_feature_cnt > 100 :
             numberOfExcludedIndex = float(total_feature_cnt) * 0.1
         else:
