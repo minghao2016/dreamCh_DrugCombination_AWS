@@ -408,11 +408,11 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
         valuelist_mse.append(indexvaluedict_mse[maxparam+"_"+str(i)])
 
     # correlation
-    f = open(paramPath + '.corr','w')
+    f = open(paramPath,'w')
     f.write("C,Gamma\n"+finalC+","+finalGamma+"\n")
     f.flush()
     f.close()
-    f = open(baselinePath + '.corr' , "w")
+    f = open(baselinePath , "w")
     f.write("index,baseline\n")
     for i in range(10):
         f.write(str(i)+","+str(valuelist[i])+'\n')
@@ -420,11 +420,11 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
     f.close()
 
     # mse
-    f = open(paramPath,'w')
+    f = open(paramPath + '.mse','w')
     f.write("C,Gamma\n"+finalC_mse+","+finalGamma_mse+"\n")
     f.flush()
     f.close()
-    f = open(baselinePath, "w")
+    f = open(baselinePath + '.mse', "w")
     f.write("index,baseline\n")
     for i in range(10):
         f.write(str(i)+","+str(valuelist_mse[i])+'\n')

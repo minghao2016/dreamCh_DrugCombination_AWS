@@ -1,6 +1,5 @@
 rm -rf ~/data
 
-mv data.tar.gz ~/
 cd ~/
 
 tar -zxvf data.tar.gz

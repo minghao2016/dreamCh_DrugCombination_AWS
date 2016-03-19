@@ -369,11 +369,11 @@ def handle_single_set(set_idx, round_num):
             value = robjects.r['getGlobalScore_ch1'](trainDir,cvFileName)[1]
 
         #mse metric
-        value = get_mse(trainDir, cvFileName)
-        sunKyu_Value = baseline[int(index)] - value
+        #value = get_mse(trainDir, cvFileName)
+        #sunKyu_Value = baseline[int(index)] - value
 
         # correlation metric
-        #sunKyu_Value = value - baseline[int(index)]
+        sunKyu_Value = value - baseline[int(index)]
 
         """
         l = result[int(index)]

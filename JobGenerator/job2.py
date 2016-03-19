@@ -15,22 +15,22 @@ def params(round_num, j1_type, excluded_feature_cnt):
 
         pastRound_bestC = int(float(params[0]))
 
-    remain_feature_cnt = 954 - excluded_feature_cnt
+    remain_feature_cnt = 991  - excluded_feature_cnt
     pbc = pastRound_bestC
 
+
     if remain_feature_cnt > 500 :
-        c_list = [pbc - 200, pbc - 120, pbc - 60, pbc - 30,  pbc, pbc + 30, pbc + 60, pbc + 120, pbc + 200]
+        c_list = [pbc-400,pbc-300, pbc - 200, pbc - 120, pbc - 90, pbc - 60, pbc - 30,  pbc, pbc + 30, pbc + 60, pbc + 90, pbc + 120, pbc + 200, pbc+300, pbc+400]
     elif remain_feature_cnt > 300 :
-        c_list = [pbc - 150, pbc - 80, pbc - 50, pbc - 20, pbc, pbc + 20, pbc + 50, pbc + 80, pbc + 150]
+        c_list = [pbc-350,pbc-250, pbc - 150, pbc - 80, pbc - 60, pbc - 40, pbc - 20, pbc, pbc + 20, pbc + 40, pbc + 60, pbc + 80, pbc + 150, pbc+250, pbc+350]
     elif remain_feature_cnt > 150:
-        c_list = [pbc - 100, pbc - 60, pbc - 30, pbc - 10, pbc, pbc + 10, pbc + 30, pbc + 60, pbc + 100]
+        c_list = [pbc-300,pbc-200,pbc - 100, pbc - 60, pbc-40, pbc - 20, pbc - 10, pbc, pbc + 10, pbc + 20, pbc+40, pbc + 60, pbc + 100, pbc+200, pbc+300]
     elif remain_feature_cnt > 80:
-        c_list = [pbc - 60, pbc - 40, pbc - 20, pbc - 10 , pbc, pbc + 10, pbc + 20, pbc + 40, pbc + 60]
+        c_list = [pbc-250, pbc-150, pbc - 60, pbc - 40, pbc-30, pbc - 20, pbc - 10 , pbc, pbc + 10, pbc + 20, pbc+30, pbc + 40, pbc + 60, pbc + 150, pbc+250]
     elif remain_feature_cnt <= 0 :
         c_list = range(60 , 400, 10)
     else :
         c_list = [pbc - 40, pbc - 20, pbc - 10, pbc, pbc + 10, pbc + 20, pbc + 40]
-
 
     if remain_feature_cnt <= 0 :
         gamma_list = [x/1000.0 for x in range(1,100,10)]

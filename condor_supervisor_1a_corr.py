@@ -120,8 +120,7 @@ class Supervisor():
         if self.round_num != 0:
 
             content = [
-                    '::MSE metric::\nProblem ' + self.problem_num + '.' + self.j1_type,
-                    'initial removed : 801',
+                    '::Correlation metric::\nProblem ' + self.problem_num + '.' + self.j1_type,
                     '#Round ' + str(self.round_num-1),
 
                     'removed feature cnt: ' + str(removed_feature_cnt) + ' in next Round']

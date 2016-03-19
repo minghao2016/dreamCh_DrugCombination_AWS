@@ -76,7 +76,7 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
     #resultDF_mean_overThreshold = resultDF_mean_sorted[resultDF_mean_sorted["Mean"] >= meanthreshold]
     resultDF_mean_overThreshold = resultDF_mean_sorted
 
-    resultDF_overThreshold= resultDF_overThreshold.append(resultDF_mean_overThreshold)
+    #resultDF_overThreshold= resultDF_overThreshold.append(resultDF_mean_overThreshold)
 
     #total_feature_cnt = len(resultDF_overThreshold.index)
     # TODO:
@@ -124,7 +124,7 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
             'leeheewon78@gmail.com',
             'kangj@korea.ac.kr',
             'minhwan90@gmail.com']
-    contents = "::MSE metric::\n\n#removed: " + str(len(extractedColumnIndexList)) + "\n\n" + contents
+    contents = "Problem1.a\n::Corr metric::\n\n#removed: " + str(len(extractedColumnIndexList)) + "\n\n" + contents
 
     msg = MIMEText(contents, 'plain', 'utf-8')
     msg['Subject'] = Header('J6 Result', 'utf-8')

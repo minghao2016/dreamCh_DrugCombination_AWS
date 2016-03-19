@@ -112,9 +112,6 @@ class Generator():
             if int(p) in removed_feature_indexes:
                 continue
 
-            if p == 1262:
-                continue
-
             self.config[4]['arguments'] = ['J4.py', str(p), str(q)]
             contents.append(self.get_submit_content(4))
         return contents

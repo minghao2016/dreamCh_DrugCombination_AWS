@@ -8,9 +8,10 @@ def params(j1_type):
                 for q in range(0, 10)
                 ]
     else:
+        ### Problem 1.b
         values = [
                 (p, q)
-                for p in range(294,911) ## 294~881
+                for p in range(218,919) ## 294~881
                 for q in range(0, 10)
                 ]
 
