@@ -15,10 +15,12 @@ def params(round_num, j1_type, excluded_feature_cnt):
 
         pastRound_bestC = int(float(params[0]))
 
-    remain_feature_cnt = 991  - excluded_feature_cnt
+    #remain_feature_cnt = 991  - excluded_feature_cnt
+    remain_feature_cnt = 1298  - excluded_feature_cnt
     pbc = pastRound_bestC
 
 
+    """
     if remain_feature_cnt > 500 :
         c_list = [pbc-400,pbc-300, pbc - 200, pbc - 120, pbc - 90, pbc - 60, pbc - 30,  pbc, pbc + 30, pbc + 60, pbc + 90, pbc + 120, pbc + 200, pbc+300, pbc+400]
     elif remain_feature_cnt > 300 :
@@ -31,6 +33,8 @@ def params(round_num, j1_type, excluded_feature_cnt):
         c_list = range(60 , 400, 10)
     else :
         c_list = [pbc - 40, pbc - 20, pbc - 10, pbc, pbc + 10, pbc + 20, pbc + 40]
+    """
+    c_list = range(60, 300, 10)
 
     if remain_feature_cnt <= 0 :
         gamma_list = [x/1000.0 for x in range(1,100,10)]

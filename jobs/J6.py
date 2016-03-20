@@ -40,8 +40,8 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
         countList.append(count)
 
     resultDF = pd.DataFrame({"Mean":meanList, "Count":countList}, index=indexList)
-    #resultDF_sorted = resultDF.sort_values(["Count", "Mean"], ascending=False)
-    resultDF_sorted = resultDF.sort_values(["Mean"], ascending=False)
+    resultDF_sorted = resultDF.sort_values(["Count", "Mean"], ascending=False)
+    # resultDF_sorted = resultDF.sort_values(["Mean"], ascending=False)
 
     resultDF_mean_sorted = resultDF.sort_values(["Mean"], ascending=False)
 
@@ -62,7 +62,8 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
 
     main_count = 0
     #resultDF_sorted_ascending = resultDF.sort_values(["Count", "Mean"], ascending=True)
-    resultDF_sorted_ascending = resultDF.sort_values(["Mean"], ascending=True)
+    #resultDF_sorted_ascending = resultDF.sort_values(["Mean"], ascending=True)
+    resultDF_sorted_ascending = resultDF.sort_values(["Count", "Mean"], ascending=True)
     for t in resultDF_sorted_ascending.itertuples():
         for v in t:
             contents += str(v) + " "
@@ -71,28 +72,33 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
             break
         main_count += 1
 
-    #resultDF_overThreshold = resultDF_sorted[resultDF_sorted["Count"] >= threshold]
-    resultDF_overThreshold = resultDF_sorted
+    resultDF_overThreshold = resultDF_sorted[resultDF_sorted["Count"] >= threshold]
+    # resultDF_overThreshold = resultDF_sorted
     #resultDF_mean_overThreshold = resultDF_mean_sorted[resultDF_mean_sorted["Mean"] >= meanthreshold]
     resultDF_mean_overThreshold = resultDF_mean_sorted
 
     #resultDF_overThreshold= resultDF_overThreshold.append(resultDF_mean_overThreshold)
+    sortedfeatureList = resultDF_overThreshold.index.tolist()
+    sortedfeatureList.extend([x for x in resultDF_mean_overThreshold.index if x not in sortedfeatureList])
 
     #total_feature_cnt = len(resultDF_overThreshold.index)
     # TODO:
-    total_feature_cnt = len(resultDF_overThreshold.index.unique())
+    # total_feature_cnt = len(resultDF_overThreshold.index.unique())
+    total_feature_cnt = len(sortedfeatureList)
 
-    if int(total_feature_cnt) <= 50 :
+    if int(total_feature_cnt) <= 400 :
         extractedColumnIndexList = list()
     else:
-        if total_feature_cnt > 300 :
-            numberOfExcludedIndex = float(total_feature_cnt) * 0.2
-        elif total_feature_cnt > 200 :
+        if total_feature_cnt > 850 :
             numberOfExcludedIndex = float(total_feature_cnt) * 0.15
-        elif total_feature_cnt > 100 :
+        elif total_feature_cnt > 700 :
             numberOfExcludedIndex = float(total_feature_cnt) * 0.1
+        elif total_feature_cnt > 600 :
+            numberOfExcludedIndex = float(total_feature_cnt) * 0.05
+        elif total_feature_cnt > 500 :
+            numberOfExcludedIndex = float(total_feature_cnt) * 0.04
         else:
-            numberOfExcludedIndex = float(total_feature_cnt) * 0.1
+            numberOfExcludedIndex = float(total_feature_cnt) * 0.04
         """
         if total_feature_cnt > 20 :
             numberOfExcludedIndex = 2
@@ -103,8 +109,8 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
         if numberOfExcludedIndex < 1 :
             numberOfExcludedIndex = 1.0
 
-        extractedColumnIndexList = list(resultDF_overThreshold.index[:int(numberOfExcludedIndex)])
-
+        # extractedColumnIndexList = list(resultDF_overThreshold.index[:int(numberOfExcludedIndex)])
+        extractedColumnIndexList = list(sortedfeatureList[:int(numberOfExcludedIndex)])
 
     paths = extractedColumnIndexPath.split('/')
     target_dir = '/'.join(paths[:-1])

@@ -112,7 +112,7 @@ class Supervisor():
         return target_dir
 
     def send_submit_form(self, submit_dir_path):
-        call(['condor_submit_dag',submit_dir_path + '/DAGman.' + str(self.round_num) + '.dag'])
+        call(['condor_submit_dag','-maxidle','1000', submit_dir_path + '/DAGman.' + str(self.round_num) + '.dag'])
 
         time.sleep(60)
 
