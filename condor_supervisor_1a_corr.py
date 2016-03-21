@@ -156,11 +156,16 @@ class Supervisor():
         if self.round_num != 0:
 
             content = [
-                    '::Correlation metric::\nProblem ' + self.problem_num + '.' + self.j1_type,
-                    '#Round ' + str(self.round_num-1),
+                    ':: ' + self.problem_num + '.' + self.j1_type,
+                    '\n#Round ' + str(self.round_num-1)]
 
-                    'removed feature cnt: ' + str(removed_feature_cnt) + ' in next Round']
+            f = open('/'.join(['data', str(self.round_num-1), 'J3condor', 'result', 'parameter.csv']))
+            content.append(f.read())
+            f.close()
+            content.append("\n")
 
+            # CV Set
+            content.append("## CV Set")
             value_sum = .0
             f = open('/'.join(['data', str(self.round_num-1), 'J3condor', 'result', 'baseline.csv']))
             for line in f :
@@ -172,10 +177,16 @@ class Supervisor():
                 content.append(line)
             f.close()
 
-
             content.append("# Avg ")
             content.append(str(value_sum/10))
 
+            #Test Set
+            content.append("\n\n#Test Set")
+            f = open('/'.join(['data', str(self.round_num-1), 'J3condor', 'final_result.txt']))
+            content.append(f.read())
+            f.close()
+
+            content.append('removed feature cnt: ' + str(removed_feature_cnt) + ' in next Round')
             email_sender.send('\n'.join(content))
 
 

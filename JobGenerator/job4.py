@@ -1,3 +1,9 @@
+import json
+
+f = open('JobGenerator/excluded_candidate.txt')
+candidate = [int(v) for v in f]
+f.close()
+
 def params(j1_type):
     if j1_type == 'a':
         values = [
@@ -5,7 +11,7 @@ def params(j1_type):
                 # previous feature range
                 #for p in range(294,1248) ## 294~1248
                 #for p in range(303, 1294) ## 294~124a
-                for p in range(303, 800) ## 294~124a
+                for p in candidate
                 for q in range(0, 10)
                 ]
     else:
