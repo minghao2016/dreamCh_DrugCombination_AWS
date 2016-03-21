@@ -23,7 +23,6 @@ value1 = float(sys.argv[3])
 value2 = float(sys.argv[4])
 value4 = int(sys.argv[5])
 
-
 def find_max_index(train_libfm, test_libfm):
     index_list = []
     with open(train_libfm,'r') as r:
@@ -105,11 +104,19 @@ def convertToSKlearnInput(libfmFile):
         return feature_list, synergy_list
 
 
+def get_excluded_list():
+    file_path = 'excludedIndexes.txt'
+    f = open(file_path)
+
+    excluded_list = list()
+    for v in f:
+        excluded_list.append( int(v) )
+    return excluded_list
 
 
 
-
-def run_sklearn(train_libfm, test_libfm,testPredCSV,testCSV , n_est=1000, lr=0.07, depth=7, maxindexBool=False, threshold=20):
+def run_sklearn(train_hdf, test_hdf,testPredCSV,testCSV , n_est=1000, lr=0.07, depth=7, maxindexBool=False, threshold=20):
+    """
     if maxindexBool==False:
         train_feature_list, train_synergy_list = convertToSKlearnInput(train_libfm)
         test_feature_list, test_synergy_list = convertToSKlearnInput(test_libfm)
@@ -117,6 +124,18 @@ def run_sklearn(train_libfm, test_libfm,testPredCSV,testCSV , n_est=1000, lr=0.0
         max_index = find_max_index(train_libfm,test_libfm)
         train_feature_list, train_synergy_list = convertToSKlearnInput_withMaxIndex(train_libfm,max_index)
         test_feature_list, test_synergy_list = convertToSKlearnInput_withMaxIndex(test_libfm,max_index)
+    """
+
+    train_feature_list = pd.read_hdf(train_hdf, 'traindf')
+    test_feature_list = pd.read_hdf(test_hdf, 'testdf')
+
+    train_synergy_list = train_feature_list['synergy_score']
+    train_feature_list = train_feature_list.drop('synergy_score', axis=1)
+
+    # remove excluded_indices
+    excluded_list = get_excluded_list()
+    train_feature_list = train_feature_list.drop(excluded_list, axis=1)
+    test_feature_list  = test_feature_list.drop(excluded_list, axis=1)
 
     #regr = GradientBoostingRegressor(n_estimators=n_est, learning_rate=lr, max_depth=depth, random_state=0, loss='ls')
     regr = svm.SVR(kernel='rbf', C=value1, gamma=value2, epsilon=5)
@@ -144,12 +163,12 @@ def run_sklearn(train_libfm, test_libfm,testPredCSV,testCSV , n_est=1000, lr=0.0
 
 
 
-root_dir = "/home/ubuntu/data/" + str(round_num)
+root_dir = "/home/ubuntu/data_1a/cv/data/set" + str(value4)
 os.makedirs("data/" + str(round_num) + "/J2condor/result/")
-run_sklearn(root_dir + "/J1condor/includeTestSamples_1a/set"+str(value4)+"/Train_single_new.libfm", # single train set
-            root_dir + "/J1condor/includeTestSamples_1a/set"+str(value4)+"/Test_single_new.libfm", # single test set
+run_sklearn(root_dir + "/compact_train.hdf", # single train set
+            root_dir + "/compact_test.hdf", # single test set
             "data/" + str(round_num) + "/J2condor/result/svm_result"+str(value1)+"_"+str(value2)+"_"+str(value4)+".csv", # result file path
-            "/home/ubuntu/data/answers/ch1_newtestset_wtest_"+str(value4)+".csv", # answer set
+            "/home/ubuntu/data_1a/cv/answers/ch1_new_test_set_excluded_"+str(value4)+".csv", # answer set
             maxindexBool=True)
 
 

@@ -360,7 +360,7 @@ def handle_single_set(set_idx, round_num):
         index = zz.split("_")[1]
         deleteIndex = zz.split("_")[0]
 
-        testsetpath = "/home/ubuntu/data/answers/ch1_newtestset_wtest_"
+        testsetpath = "/home/ubuntu/data_1a/cv/answers/ch1_new_test_set_excluded_"
         trainDir = testsetpath + str(index)+".csv"#answerSewt
 
         if problemNum == "2" :

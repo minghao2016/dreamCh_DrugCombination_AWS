@@ -3,6 +3,7 @@ import email_sender
 from subprocess import check_output, call
 from JobGenerator.generator import Generator as Job_Generator
 from jobs import J1
+from jobs import svr as testset_svr
 
 class Supervisor():
     def __init__(self, round_num, j1_type, problem_num):
@@ -41,8 +42,12 @@ class Supervisor():
     def execute_new_cycle(self):
 
         # Step1 :
+        """
         if self.round_num != 0:
             self.move_J1data()
+        """
+        if self.round_num != 0:
+            self.eval_testset()
 
         # execute J1
         removed_feature_indexes = self.execute_job1_distribute_data()
@@ -60,6 +65,42 @@ class Supervisor():
         self.round_num = self.round_num + 1
 	time.sleep(10)
 
+    ################################3
+    ## Eval in Testset
+    def get_excluded_list(self):
+        target_path = 'excludedIndexes.txt'
+        f = open(target_path)
+        excluded_list = [ int(v.strip()) for v in f]
+        f.close()
+
+        return excluded_list
+
+    def get_round_bestParams(self):
+        target_path = '/'.join(['data', str(self.round_num-1), 'J3condor', 'result', 'parameter.csv'])
+        f = open(target_path)
+        lines = f.read().split('\n')
+
+        target_line = lines[1].strip()
+        params = target_line.split(',')
+
+        return (float(params[0]), float(params[1]))
+
+    def eval_testset(self):
+        (C, gamma) = self.get_round_bestParams()
+        excluded_list = self.get_excluded_list()
+
+        print "## Evaluate Test set"
+        print (C, gamma)
+        print excluded_list
+
+        testset_svr.run(
+                '/'.join(['data_1a', 'test', 'data']),
+                '/'.join(['data_1a', 'test', 'answers', 'ch1_newtest_excluded.csv']),
+                '/'.join(['data', str(self.round_num-1), 'J3condor']),
+                C, gamma,
+                excluded_list,
+                self.problem_num)
+
     def execute_job1_distribute_data(self):
         #step1 : execute Job on locally
         print "job1 execute"
@@ -67,18 +108,13 @@ class Supervisor():
         print "job1 finish"
 
         #step2 : distributing data
-        call(['bash', 'uploader.sh', str(self.round_num)])
+        #call(['bash', 'uploader.sh', str(self.round_num)])
 
         return removed_feature_indexes
 
     def move_J1data(self):
         src_dir = '/'.join(['data', str(self.round_num-1), 'J1condor'])
         dst_dir = '/'.join(['data', str(self.round_num), 'J1condor'])
-        shutil.copytree(src_dir, dst_dir)
-
-    def move_J6data(self):
-        src_dir = '/'.join(['data', str(self.round_num-1), 'J6condor'])
-        dst_dir = '/'.join(['data', str(self.round_num), 'J6condor'])
         shutil.copytree(src_dir, dst_dir)
 
     def generate_submit_form(self, removed_feature_indexes):
@@ -157,5 +193,3 @@ if __name__ == '__main__':
         else:
             supervisor.execute_new_cycle()
             time.sleep(10)
-    #supervisor.generate_submit_form(range(294,600))
-    #print supervisor.exist_jobs('run')

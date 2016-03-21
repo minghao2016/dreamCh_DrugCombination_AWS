@@ -118,32 +118,54 @@ def get_params():
 
     return (float(params[0]), float(params[1]))
 
+def get_excluded_list():
+    file_path = 'excludedIndexes.txt'
+    f = open(file_path)
 
-def run_sklearn(train_libfm, test_libfm,testPredCSV,testCSV , n_est=1000, lr=0.07, depth=7, maxindexBool=True, threshold=20):
+    excluded_list = list()
+    for v in f:
+        excluded_list.append( int(v) )
+    return excluded_list
 
+
+def run_sklearn(train_hdf, test_hdf,testPredCSV,testCSV , n_est=1000, lr=0.07, depth=7, maxindexBool=True, threshold=20):
+
+    """
     if maxindexBool == True:
         max_index = find_max_index(train_libfm,test_libfm)
         train_feature_list, train_synergy_list = convertToSKlearnInput_withMaxIndex(train_libfm,max_index)
         test_feature_list, test_synergy_list = convertToSKlearnInput_withMaxIndex(test_libfm,max_index)
-
-
 
     train_feature_df = pd.DataFrame(train_feature_list)
     test_feature_df = pd.DataFrame(test_feature_list)
 
     train_feature_df = train_feature_df.drop(value1, axis=1)
     test_feature_df = test_feature_df.drop(value1, axis=1)
+    """
+
+    train_feature_list = pd.read_hdf(train_hdf, 'traindf')
+    test_feature_list = pd.read_hdf(test_hdf, 'testdf')
+
+    train_synergy_list = train_feature_list['synergy_score']
+    train_feature_list = train_feature_list.drop('synergy_score', axis=1)
+
+    # remove excluded_indices
+    excluded_list = get_excluded_list()
+    excluded_list.append(value1)
+    print len(excluded_list)
+    train_feature_list = train_feature_list.drop(excluded_list, axis=1)
+    test_feature_list  = test_feature_list.drop(excluded_list, axis=1)
+
+
 
     #regr = GradientBoostingRegressor(n_estimators=n_est, learning_rate=lr, max_depth=depth, random_state=0, loss='ls')
     (param_c, param_gamma) = get_params()
-    print param_c
-    print param_gamma
     regr = svm.SVR(kernel='rbf', C=param_c, gamma=param_gamma, epsilon=5)
     #regr = ensemble.RandomForestRegressor(n_estimators=value1,max_features=value2, max_depth=value3,n_jobs=4, verbose=1)
     #regr = KernelRidge(kernel='rbf',alpha=value1, gamma=value2)
     #regr = MultiTaskLasso(alpha=1.0)
-    regr.fit(train_feature_df , train_synergy_list)
-    pred = regr.predict(test_feature_df)
+    regr.fit(train_feature_list, train_synergy_list)
+    pred = regr.predict(test_feature_list)
     testDF = pd.read_csv(testCSV).loc[:,["CELL_LINE","COMBINATION_ID","SYNERGY_SCORE"]]
 
     testDF["SYNERGY_SCORE"]=pred
@@ -171,21 +193,15 @@ for fn in os.listdir(featureFolderPath):
 if value1 in delfeatlist:
     os.makedirs('./data')
 else:
-    root_dir = "/home/ubuntu/data/" + str(round_num)
-
     os.makedirs("data/" + str(round_num) + "/J4condor/result/")
 
-    try:
-        run_sklearn(root_dir + "/J1condor/includeTestSamples_1a/set"+str(value4)+"/Train_single_new.libfm", # single train set
-                    root_dir + "/J1condor/includeTestSamples_1a/set"+str(value4)+"/Test_single_new.libfm", # single test set
-                    "data/" + str(round_num) + "/J4condor/result/svm_result"+str(value1)+"_"+str(value4)+".csv",
-                    "/home/ubuntu/data/answers/ch1_newtestset_wtest_"+str(value4)+".csv", # answer set
-                    #dellist,
-                    1000, 0.07, 7, True)
-    except:
-        pass
-
-
+    root_dir = "/home/ubuntu/data_1a/cv/data/set" + str(value4)
+    os.makedirs("data/" + str(round_num) + "/J2condor/result/")
+    run_sklearn(root_dir + "/compact_train.hdf", # single train set
+                root_dir + "/compact_test.hdf", # single test set
+                "data/" + str(round_num) + "/J4condor/result/svm_result"+str(value1)+"_"+str(value4)+".csv", # result file path
+                "/home/ubuntu/data_1a/cv/answers/ch1_new_test_set_excluded_"+str(value4)+".csv", # answer set
+                1000, 0.07, 7, True)
 """
 run_sklearn("J1condor/set"+str(value4)+"/Train_single_new.libfm", # single train set
             "J1condor/set"+str(value4)+"/Test_single_new.libfm", # single test set

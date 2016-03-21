@@ -38,7 +38,6 @@ def execute(round_num):
     round_num_str = str(round_num)
 
     dataFilePath = "data/" + round_num_str + "/J1condor/includeTestSamples_1a/"
-
     droplinesSet = set()
     for round_idx in range(round_num+1):
     	j6FilePath = "data/" + str(round_idx) + "/J6condor/result/"
@@ -61,6 +60,7 @@ def execute(round_num):
     print len(droplinesSet)," features are removed"
     droplines = list(droplinesSet)
 
+    """
     processes = list()
     for i in range(0,10):
 	p = Process(target=single_loop, args=(i,dataFilePath, droplines))
@@ -69,12 +69,18 @@ def execute(round_num):
 
     for p in processes:
         p.join()
+    """
 
     # rewrite result6 file
     total_j6_file_path = "data/" + str(round_idx) + "/J6condor/result/excludedIndexes.txt"
     f = open(total_j6_file_path, 'w')
     f.write('\n'.join([ str(val) for val in droplines ]))
     f.close()
+
+
+    tmp_excluded = open('excludedIndexes.txt', 'w')
+    tmp_excluded.write('\n'.join([ str(val) for val in droplines ]))
+    tmp_excluded.close()
 
     return droplinesSet
 

@@ -1,10 +1,9 @@
-rm -rf ~/data
+rm -rf ~/data_1a
 
 cd ~/
 
-tar -zxvf data.tar.gz
-tar -zxvf answers.tar.gz
+tar -zxvf data_1a.tar.gz
 
-chmod -R 777 ~/data
+chmod -R 777 ~/data_1a
 
-rm -rf ~/data.tar.gz
+rm -rf ~/data_1a.tar.gz

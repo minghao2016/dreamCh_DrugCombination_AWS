@@ -20,6 +20,7 @@ from sklearn.metrics import mean_squared_error
 
 round_num = sys.argv[1]
 problemNum = sys.argv[2]
+min_variance = 20
 
 def get_mse(obs, pred):
     obs_df=pd.read_csv(obs)
@@ -336,9 +337,11 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
 
     valuedict = {}
     indexvaluedict = {}
-
+    c_dict = dict()
+    """
     valuedict_mse = {}
     indexvaluedict_mse = {}
+    """
 
     for fname in glob.glob(resultFilePath+"*.csv"):
         print fname
@@ -352,6 +355,7 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
 
         trainDir = testDirList[int(Index)]
 
+        print trainDir, fname
         if problemNum == "2" :
             value = robjects.r['getGlobalScore_ch2'](trainDir, fname)[0]
 
@@ -366,6 +370,12 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
         valuedict[C+"_"+Gamma] = l
         indexvaluedict[C+"_"+Gamma+"_"+Index] = value
 
+        if C not in c_dict:
+            c_dict[C] = list()
+
+        c_dict[C].append(value)
+
+        """
         mse = get_mse(trainDir, fname)
         if C+"_"+Gamma not in valuedict_mse:
             valuedict_mse[C+"_"+Gamma] = []
@@ -373,11 +383,51 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
         l.append(mse)
         valuedict_mse[C+"_"+Gamma] = l
         indexvaluedict_mse[C+"_"+Gamma+"_"+Index] = mse
+        """
 
     maxparam = "0.0_0.0"
     maxvalue = -1
 
+    # find means
+    mean_dict = dict()
+    for k,v in c_dict.items():
+        mean_dict[sum(v)/len(v)] = {
+                'values': v,
+                'C': k
+        }
 
+    target_mean_indices = sorted(mean_dict)[-3:]
+    target_C_mean = [
+            (float(mean_dict[mean]['C']), mean)
+            for mean in target_mean_indices
+            ]
+
+    sorted_target_C = sorted(target_C_mean)
+
+    # mid C
+    mid_C = sorted_target_C[1][0]
+    # variance
+    variance = mid_C / 20.0
+    if variance < min_variance :
+        variance = min_variance
+
+    start = mid_C - variance
+    end = mid_C + variance
+
+
+    # find best C
+    (max_mean, max_c) = (0.0, 0.0)
+    for (C, mean) in sorted_target_C:
+        f_mean = float(mean)
+        if C >= start and C <= end and f_mean > float(max_mean):
+            (max_mean, max_c) = (mean, C)
+
+    maxC_dict = mean_dict[max_mean]
+
+    best_C = maxC_dict['C']
+    cv_result = maxC_dict['values']
+    cv_mean = sum(cv_result) / len(cv_result)
+    #########################################
     # correlation
     for key in valuedict:
         meanvalue = np.mean(valuedict[key])
@@ -391,7 +441,19 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
     for i in range(10):
         valuelist.append(indexvaluedict[maxparam+"_"+str(i)])
 
+    # correlation
+    f = open(paramPath,'w')
+    f.write("C,Gamma\n"+best_C+","+finalGamma+"\n")
+    f.flush()
+    f.close()
+    f = open(baselinePath , "w")
+    f.write("index,baseline\n")
+    for i in range(10):
+        f.write(str(i)+","+str(valuelist[i])+'\n')
+        f.flush()
+    f.close()
 
+    """
     # mse
     minparam = "0.0_0.0"
     minvalue = 1000000
@@ -406,19 +468,10 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
 
     for i in range(10):
         valuelist_mse.append(indexvaluedict_mse[maxparam+"_"+str(i)])
+    """
 
-    # correlation
-    f = open(paramPath,'w')
-    f.write("C,Gamma\n"+finalC+","+finalGamma+"\n")
-    f.flush()
-    f.close()
-    f = open(baselinePath , "w")
-    f.write("index,baseline\n")
-    for i in range(10):
-        f.write(str(i)+","+str(valuelist[i])+'\n')
-        f.flush()
-    f.close()
 
+    """
     # mse
     f = open(paramPath + '.mse','w')
     f.write("C,Gamma\n"+finalC_mse+","+finalGamma_mse+"\n")
@@ -430,13 +483,16 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
         f.write(str(i)+","+str(valuelist_mse[i])+'\n')
         f.flush()
     f.close()
+    """
 
 # output : both float values. and one list of each index's finalscore Those will be used as C and Gamma params in SVR learning
 
 # This is an example of inputs and outputs
 if __name__ == '__main__':
-    testsetpath = "/home/ubuntu/data/answers/ch1_newtestset_wtest_"
+    testsetpath = "/home/ubuntu/data_1a/cv/answers/ch1_new_test_set_excluded_"
     testsetList = []
     for i in range(10):
         testsetList.append(testsetpath+str(i)+".csv")
+
+    testsetList = sorted(testsetList)
     findBestParam("J2condor/result/", testsetList, "data/" + round_num + "/J3condor/result/parameter.csv", "data/" + round_num + "/J3condor/result/baseline.csv")
