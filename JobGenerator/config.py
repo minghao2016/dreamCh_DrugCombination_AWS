@@ -6,7 +6,7 @@ j1 = {
 }
 
 j2 = {
-    'inputs': ['jobs/J2.py, excludedIndexes.txt'],
+    'inputs': ['jobs/J2.py', 'default_groups.txt', 'default_ids.txt'],
     'outputs': [],
     'arguments': ['J2.py'],
     'requirements': 'Requirements = (OpSys == "LINUX")'
@@ -21,7 +21,7 @@ j3 = {
 }
 
 j4 = {
-    'inputs': ['jobs/J4.py, excludedIndexes.txt', 'J3condor', 'J6condor'],
+    'inputs': ['jobs/J4.py', 'default_groups.txt', 'default_ids.txt', 'J3condor'],
     'outputs': [],
     'arguments': ['J4.py'],
     'requirements': 'Requirements = (OpSys == "LINUX")'

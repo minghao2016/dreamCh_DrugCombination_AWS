@@ -5,11 +5,14 @@ import sys
 import pandas as pd
 import os, shutil
 import Constant
-import email_sender
+import csv
+#import email_sender
 
 
 #input1:defaultTrainlibfm
 #input2:defaultTestlibfm
+
+default_feature_dir = '/'.join(['data', 'features']) + '/exclude_'
 
 #defaultTestlibfm = "includeTest_single_2.libfm"
 #defaultTrainlibfm = "includeTrain_single_2.libfm"
@@ -18,8 +21,9 @@ defaultTrainlibfm = "tmpTrain_single_1a_expanded.libfm"
 # defaultTrainlibfm = sys.argv[0]
 # defaultTestlibfm = sys.argv[1]
 
+"""
 def single_loop(i, dataFilePath, droplines):
-    currfilePath = dataFilePath+"set"+str(i)+"/"
+    currfilePath = dataFilePath+"set/"+str(i) + "/"
     basicTrainlibfm = currfilePath+defaultTrainlibfm
     basicTestlibfm = currfilePath+defaultTestlibfm
 
@@ -32,19 +36,41 @@ def single_loop(i, dataFilePath, droplines):
 
     Constant.makeLibfmFileWithDF(originaltrainDF, newtrainDF,currfilePath+"Train_single_new.libfm")
     Constant.makeLibfmFileWithDF(originaltestDF, newtestDF,currfilePath+"Test_single_new.libfm")
-
+"""
 
 def execute(round_num):
     round_num_str = str(round_num)
 
-    dataFilePath = "data/" + round_num_str + "/J1condor/includeTestSamples_1a/"
-    droplinesSet = set()
-    for round_idx in range(round_num+1):
+    include_features= set()
+    include_ids     = set()
+
+    # read initial default feature group
+    f = open('data/initial_default_feature_group.txt')
+    include_features.update(f.read().splitlines())
+    f.close()
+
+    print "-----------------------------------------"
+    for round_idx in range(round_num):
     	j6FilePath = "data/" + str(round_idx) + "/J6condor/result/"
 
 	#test
 	J6FileNames = os.listdir(j6FilePath)
 
+        for J6FileName in J6FileNames:
+	    f = open(j6FilePath+J6FileName,"r")
+            include_features.update(f.read().splitlines())
+            f.close()
+
+    for include_feature in include_features:
+        feature_file_path = default_feature_dir + include_feature + '.csv'
+        f = open(feature_file_path, 'r')
+        csv_f = csv.reader(f)
+        csv_f.next()
+        for row in csv_f:
+            include_ids.add(int(row[0]))
+        f.close()
+
+        """ EXCLUDE VERSION
         lines = list()
 	for J6FileName in J6FileNames:
 	    print j6FilePath+J6FileName
@@ -56,11 +82,37 @@ def execute(round_num):
         if len(lines) == 0 and round_num != 0 and round_num == round_idx:
             email_sender.send("Finish!")
             sys.exit()
+        """
 
-    print len(droplinesSet)," features are removed"
-    droplines = list(droplinesSet)
+    print include_features
+    print len(include_ids)," features will be used"
+    print "-----------------------------------------"
 
-    """
+    curr_round_dir = "data/" + str(round_num)  + "/"
+    try:
+        os.makedirs(curr_round_dir)
+    except OSError:
+        pass
+    except e:
+        raise e
+
+
+    # write default ids
+    f = open(curr_round_dir + 'default_ids.txt', 'w')
+    for include_id in include_ids:
+        f.write(str(include_id))
+        f.write('\n')
+    f.close()
+
+    # write default groups
+    f = open(curr_round_dir + 'default_groups.txt', 'w')
+    for include_feature in include_features:
+        f.write(include_feature)
+        f.write('\n')
+    f.close()
+
+    return include_features
+    """ EXCLUDE VERSION
     processes = list()
     for i in range(0,10):
 	p = Process(target=single_loop, args=(i,dataFilePath, droplines))
@@ -69,9 +121,7 @@ def execute(round_num):
 
     for p in processes:
         p.join()
-    """
 
-    # rewrite result6 file
     total_j6_file_path = "data/" + str(round_idx) + "/J6condor/result/excludedIndexes.txt"
     f = open(total_j6_file_path, 'w')
     f.write('\n'.join([ str(val) for val in droplines ]))
@@ -83,8 +133,8 @@ def execute(round_num):
     tmp_excluded.close()
 
     return droplinesSet
-
+    """
     #`call(["bash", "uploader.sh"])
 
 if __name__ == '__main__':
-    execute(0)
+    execute(3)

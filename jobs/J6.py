@@ -25,7 +25,7 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
     meanList = []
     countList = []
     for tuple in result.itertuples():
-        index = int(tuple[0])
+        index = tuple[0]
         data = []
         for v in tuple[1:]:
             v_float = float(v)
@@ -86,6 +86,7 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
     # total_feature_cnt = len(resultDF_overThreshold.index.unique())
     total_feature_cnt = len(sortedfeatureList)
 
+    """
     if int(total_feature_cnt) <= 400 :
         extractedColumnIndexList = list()
     else:
@@ -99,18 +100,17 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
             numberOfExcludedIndex = float(total_feature_cnt) * 0.04
         else:
             numberOfExcludedIndex = float(total_feature_cnt) * 0.04
-        """
         if total_feature_cnt > 20 :
             numberOfExcludedIndex = 2
         else:
             numberOfExcludedIndex = 1
-        """
 
         if numberOfExcludedIndex < 1 :
             numberOfExcludedIndex = 1.0
-
-        # extractedColumnIndexList = list(resultDF_overThreshold.index[:int(numberOfExcludedIndex)])
         extractedColumnIndexList = list(sortedfeatureList[:int(numberOfExcludedIndex)])
+    """
+    numberOfExcludedIndex = 1
+    extractedColumnIndexList = list(sortedfeatureList[:int(numberOfExcludedIndex)])
 
     paths = extractedColumnIndexPath.split('/')
     target_dir = '/'.join(paths[:-1])
@@ -120,6 +120,7 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
         for v in extractedColumnIndexList:
             fw.write(str(v) + "\n")
 
+    """
     smtp_host = 'smtp.gmail.com'
     login, password = 'dmis.dreamchallenge@gmail.com', 'dmisinfos#1'
 
@@ -145,9 +146,10 @@ def makeExcludedIndex(round_num, resultDataDir, extractedColumnIndexPath, thresh
     finally:
         s.quit()
     return len(extractedColumnIndexList)
+    """
 
 if __name__ == '__main__':
     round_num = sys.argv[1]
-    makeExcludedIndex(round_num, "J5condor/result/", "data/" + str(int(round_num)+1) + "/J6condor/result/excludedIndexes.txt")
+    makeExcludedIndex(round_num, "J5condor/result/", "data/" + str(round_num) + "/J6condor/result/added_feature_gruops.txt")
 
 

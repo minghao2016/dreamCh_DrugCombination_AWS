@@ -1,9 +1,9 @@
-rm -rf ~/data_1a
+rm -rf /features
+rm -rf /hdf
 
-cd ~/
+mv features_tmp /features
+mv hdf_tmp /hdf
 
-tar -zxvf data_1a.tar.gz
+chmod -R 777 /features
+chmod -R 777 /hdf
 
-chmod -R 777 ~/data_1a
-
-rm -rf ~/data_1a.tar.gz

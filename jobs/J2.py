@@ -2,7 +2,6 @@ import sys
 import os
 import pandas as pd
 
-
 from sklearn import svm
 from sklearn.linear_model import MultiTaskLasso
 from glob import glob
@@ -113,7 +112,14 @@ def get_excluded_list():
         excluded_list.append( int(v) )
     return excluded_list
 
+def get_default_feature_ids():
+    file_path = 'default_ids.txt'
+    f = open(file_path)
 
+    excluded_list = list()
+    for v in f:
+        excluded_list.append( int(v) )
+    return excluded_list
 
 def run_sklearn(train_hdf, test_hdf,testPredCSV,testCSV , n_est=1000, lr=0.07, depth=7, maxindexBool=False, threshold=20):
     """
@@ -125,17 +131,26 @@ def run_sklearn(train_hdf, test_hdf,testPredCSV,testCSV , n_est=1000, lr=0.07, d
         train_feature_list, train_synergy_list = convertToSKlearnInput_withMaxIndex(train_libfm,max_index)
         test_feature_list, test_synergy_list = convertToSKlearnInput_withMaxIndex(test_libfm,max_index)
     """
-
+    print train_hdf
+    print test_hdf
     train_feature_list = pd.read_hdf(train_hdf, 'traindf')
-    test_feature_list = pd.read_hdf(test_hdf, 'testdf')
+    test_feature_list = pd.read_hdf(test_hdf, 'validationdf')
 
     train_synergy_list = train_feature_list['synergy_score']
     train_feature_list = train_feature_list.drop('synergy_score', axis=1)
 
+    """
     # remove excluded_indices
     excluded_list = get_excluded_list()
     train_feature_list = train_feature_list.drop(excluded_list, axis=1)
     test_feature_list  = test_feature_list.drop(excluded_list, axis=1)
+    """
+    features_ids = get_default_feature_ids()
+    train_feature_list = train_feature_list[features_ids]
+    test_feature_list  = test_feature_list[features_ids]
+
+    print features_ids
+    print len(features_ids)
 
     #regr = GradientBoostingRegressor(n_estimators=n_est, learning_rate=lr, max_depth=depth, random_state=0, loss='ls')
     regr = svm.SVR(kernel='rbf', C=value1, gamma=value2, epsilon=5)
@@ -163,12 +178,12 @@ def run_sklearn(train_hdf, test_hdf,testPredCSV,testCSV , n_est=1000, lr=0.07, d
 
 
 
-root_dir = "/home/ubuntu/data_1a/cv/data/set" + str(value4)
+root_dir = "/hdf/"
 os.makedirs("data/" + str(round_num) + "/J2condor/result/")
-run_sklearn(root_dir + "/compact_train.hdf", # single train set
-            root_dir + "/compact_test.hdf", # single test set
+run_sklearn(root_dir + str(value4) + "compact_train.hdf", # single train set
+            root_dir + str(value4) + "compact_validation.hdf", # single test set
             "data/" + str(round_num) + "/J2condor/result/svm_result"+str(value1)+"_"+str(value2)+"_"+str(value4)+".csv", # result file path
-            "/home/ubuntu/data_1a/cv/answers/ch1_new_test_set_excluded_"+str(value4)+".csv", # answer set
+            root_dir + "/answer/ch1_new_test_set_excluded_"+str(value4)+".csv", # answer set
             maxindexBool=True)
 
 

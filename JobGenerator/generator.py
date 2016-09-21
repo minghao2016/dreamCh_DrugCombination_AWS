@@ -57,7 +57,10 @@ class Generator():
 
         if job_num != 2 and job_num != 4:
             submit_form.append('\n'.join(self.log_paths))
+
+        """Write all logs
         #submit_form.append('\n'.join(self.log_paths))
+        """
 
         if 'queue_num' in config:
             submit_form.append('queue ' + str(config['queue_num']))
@@ -92,8 +95,8 @@ class Generator():
 
         return result
 
-    def get_submit_content_job2(self, removed_feature_cnt):
-        params = job2_param_gen(self.round_num, self.j1_type, removed_feature_cnt)
+    def get_submit_content_job2(self, include_features):
+        params = job2_param_gen(self.round_num, self.j1_type, include_features)
 
         contents = list()
 
@@ -102,15 +105,12 @@ class Generator():
             contents.append(self.get_submit_content(2))
         return contents
 
-    def get_submit_content_job4(self, removed_feature_indexes):
-        params = job4_param_gen(self.j1_type)
+    def get_submit_content_job4(self, include_features):
+        params = job4_param_gen(self.j1_type, include_features)
 
         contents = list()
 
         for p, q in params:
-            if int(p) in removed_feature_indexes:
-                continue
-
             self.config[4]['arguments'] = ['J4.py', str(p), str(q)]
             contents.append(self.get_submit_content(4))
         return contents

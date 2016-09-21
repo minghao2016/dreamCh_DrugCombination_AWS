@@ -354,19 +354,29 @@ def handle_single_set(set_idx, round_num):
     for cvFileName in file_paths:
         cvFileName_only_filename = cvFileName.split('/')[-1]
 
-        zz = cvFileName_only_filename.split("svm_result")[1].split(".csv")[0]
+        zz = cvFileName_only_filename.split("svm_result_")[1].split(".csv")[0]
+
+        index = zz.split("_")[-1]
+        deleteIndex = '_'.join(zz.split("_")[:-1])
 
 
-        index = zz.split("_")[1]
-        deleteIndex = zz.split("_")[0]
-
-        testsetpath = "/home/ubuntu/data_1a/cv/answers/ch1_new_test_set_excluded_"
+        testsetpath = "/hdf/answer/ch1_new_test_set_excluded_"
         trainDir = testsetpath + str(index)+".csv"#answerSewt
 
+        print "//////////////////////////"
+        print zz
+        print index
+        print deleteIndex
+        print trainDir
+        print "/////////////////////////"
+
+        """
         if problemNum == "2" :
             value = robjects.r['getGlobalScore_ch2'](trainDir, cvFileName)[0]
         else :
             value = robjects.r['getGlobalScore_ch1'](trainDir,cvFileName)[1]
+        """
+        value = robjects.r['getGlobalScore_ch1'](trainDir,cvFileName)[1]
 
         #mse metric
         #value = get_mse(trainDir, cvFileName)

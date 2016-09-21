@@ -6,7 +6,7 @@ from jobs import J1
 from jobs import svr as testset_svr
 
 class Supervisor():
-    def __init__(self, round_num, j1_type, problem_num):
+    def __init__(self, round_num, j1_type='a', problem_num='a'):
         self.j1_type = j1_type
         self.round_num = int(round_num)
         self.problem_num = problem_num
@@ -31,7 +31,7 @@ class Supervisor():
 
         #lines = jobs.strip().split('\n')
 
-        if 'ubuntu' in jobs:
+        if 'condor_dagman' in jobs:
             return True
         else:
             return False
@@ -46,16 +46,19 @@ class Supervisor():
         if self.round_num != 0:
             self.move_J1data()
         """
+        """
         if self.round_num != 0:
             self.eval_testset()
+        """
 
         # execute J1
-        removed_feature_indexes = self.execute_job1_distribute_data()
-        # send previous baseline and remove feature cnt
-        self.send_result2email(len(removed_feature_indexes))
+        #removed_feature_indexes = self.execute_job1_distribute_data()
+        default_features  = J1.execute(self.round_num)
+        #TODO: send previous baseline and remove feature cnt
+        self.send_result2email(default_features)
 
         # Step2 : Generate new condor submit according to target dir path
-        submit_file_path = self.generate_submit_form(removed_feature_indexes)
+        submit_file_path = self.generate_submit_form(default_features)
 
         # Step3 : submit condor job submit file
         print "#Execute Problem1." + self.j1_type
@@ -101,6 +104,7 @@ class Supervisor():
                 excluded_list,
                 self.problem_num)
 
+    """ EXCLUDE VER
     def execute_job1_distribute_data(self):
         #step1 : execute Job on locally
         print "job1 execute"
@@ -111,13 +115,14 @@ class Supervisor():
         #call(['bash', 'uploader.sh', str(self.round_num)])
 
         return removed_feature_indexes
+    """
 
     def move_J1data(self):
         src_dir = '/'.join(['data', str(self.round_num-1), 'J1condor'])
         dst_dir = '/'.join(['data', str(self.round_num), 'J1condor'])
         shutil.copytree(src_dir, dst_dir)
 
-    def generate_submit_form(self, removed_feature_indexes):
+    def generate_submit_form(self, include_features):
         self.job_gen.set_round_num(self.round_num)
 
         target_dir = '/'.join(['submit', str(self.round_num)])
@@ -126,9 +131,9 @@ class Supervisor():
         # TODO: clean below dirty code
         for job_num in range(2,7):
             if job_num == 2:
-                submit_content = self.job_gen.get_submit_content_job2(len(removed_feature_indexes))
+                submit_content = self.job_gen.get_submit_content_job2(include_features)
             elif job_num == 4:
-                submit_content = self.job_gen.get_submit_content_job4(removed_feature_indexes)
+                submit_content = self.job_gen.get_submit_content_job4(include_features)
                 job4_size = len(submit_content)
             else:
                 submit_content = [self.job_gen.get_submit_content(job_num)]
@@ -181,6 +186,7 @@ class Supervisor():
             content.append(str(value_sum/10))
 
             #Test Set
+            """
             content.append("\n\n#Test Set")
             f = open('/'.join(['data', str(self.round_num-1), 'J3condor', 'final_result.txt']))
             content.append(f.read())
@@ -188,17 +194,26 @@ class Supervisor():
 
             content.append('removed feature cnt: ' + str(removed_feature_cnt) + ' in next Round')
             email_sender.send('\n'.join(content))
+            """
 
 
 
 if __name__ == '__main__':
     # round number, data set type, problem num
-    supervisor = Supervisor(sys.argv[1], sys.argv[2], sys.argv[3])
+    #supervisor = Supervisor(sys.argv[1], sys.argv[2], sys.argv[3])
+    if len(sys.argv) == 1:
+        start_round = 0
+    else:
+        start_round = sys.argv[1]
+
+    supervisor = Supervisor(start_round)
+
     while True:
         if supervisor.exist_jobs('run'):
             #TODO: nothing to do
             pass
         elif supervisor.exist_jobs('held'):
+            print "Job Held!"
             email_sender.send("Job held!!!")
             sys.exit()
         else:

@@ -1,6 +1,7 @@
 import sys
 import os
 import pandas as pd
+import csv
 
 
 from sklearn import svm
@@ -20,7 +21,8 @@ featureFolderPath = "J6condor/result/" # TBD
 
 round_num = sys.argv[1]
 problemNum = sys.argv[2]
-value1 = int(sys.argv[3])
+#value1 = int(sys.argv[3])
+test_feature_name = sys.argv[3]
 value4 = int(sys.argv[4])
 
 def find_max_index(train_libfm, test_libfm):
@@ -127,6 +129,23 @@ def get_excluded_list():
         excluded_list.append( int(v) )
     return excluded_list
 
+def get_feature_ids():
+    file_path = 'default_ids.txt'
+    fids = list()
+
+    f = open(file_path)
+    for v in f:
+        fids.append( int(v) )
+
+    # add test feature ids
+    f = open('/features/exclude_' + test_feature_name + '.csv')
+    csv_f = csv.reader(f)
+    csv_f.next()
+    for v in csv_f:
+        fids.append( int(v[0]) )
+    print fids
+    return fids
+
 
 def run_sklearn(train_hdf, test_hdf,testPredCSV,testCSV , n_est=1000, lr=0.07, depth=7, maxindexBool=True, threshold=20):
 
@@ -144,18 +163,21 @@ def run_sklearn(train_hdf, test_hdf,testPredCSV,testCSV , n_est=1000, lr=0.07, d
     """
 
     train_feature_list = pd.read_hdf(train_hdf, 'traindf')
-    test_feature_list = pd.read_hdf(test_hdf, 'testdf')
+    test_feature_list = pd.read_hdf(test_hdf, 'validationdf')
 
     train_synergy_list = train_feature_list['synergy_score']
     train_feature_list = train_feature_list.drop('synergy_score', axis=1)
-
+    """
     # remove excluded_indices
     excluded_list = get_excluded_list()
     excluded_list.append(value1)
     print len(excluded_list)
     train_feature_list = train_feature_list.drop(excluded_list, axis=1)
     test_feature_list  = test_feature_list.drop(excluded_list, axis=1)
-
+    """
+    features_ids = get_feature_ids()
+    train_feature_list = train_feature_list[features_ids]
+    test_feature_list  = test_feature_list[features_ids]
 
 
     #regr = GradientBoostingRegressor(n_estimators=n_est, learning_rate=lr, max_depth=depth, random_state=0, loss='ls')
@@ -181,27 +203,29 @@ def run_sklearn(train_hdf, test_hdf,testPredCSV,testCSV , n_est=1000, lr=0.07, d
     else :
         testDF.to_csv(testPredCSV,index=False)
 
-
+"""
 delfeatlist = []
 for fn in os.listdir(featureFolderPath):
     f = open('/'.join([featureFolderPath,fn]), 'r')
     for l in f:
         delfeatlist.append((int)(l.strip()))
     f.close()
+"""
 
-
+"""
 if value1 in delfeatlist:
     os.makedirs('./data')
 else:
-    os.makedirs("data/" + str(round_num) + "/J4condor/result/")
+"""
+os.makedirs("data/" + str(round_num) + "/J4condor/result/")
 
-    root_dir = "/home/ubuntu/data_1a/cv/data/set" + str(value4)
-    os.makedirs("data/" + str(round_num) + "/J2condor/result/")
-    run_sklearn(root_dir + "/compact_train.hdf", # single train set
-                root_dir + "/compact_test.hdf", # single test set
-                "data/" + str(round_num) + "/J4condor/result/svm_result"+str(value1)+"_"+str(value4)+".csv", # result file path
-                "/home/ubuntu/data_1a/cv/answers/ch1_new_test_set_excluded_"+str(value4)+".csv", # answer set
-                1000, 0.07, 7, True)
+root_dir = "/hdf/"
+os.makedirs("data/" + str(round_num) + "/J2condor/result/")
+run_sklearn(root_dir + str(value4) + "compact_train.hdf", # single train set
+        root_dir + str(value4) + "compact_validation.hdf", # single test set
+        "data/" + str(round_num) + "/J4condor/result/svm_result_"+test_feature_name+"_"+str(value4)+".csv", # result file path
+        root_dir + '/answer/ch1_new_test_set_excluded_'+str(value4)+'.csv', # answer set
+        1000, 0.07, 7, True)
 """
 run_sklearn("J1condor/set"+str(value4)+"/Train_single_new.libfm", # single train set
             "J1condor/set"+str(value4)+"/Test_single_new.libfm", # single test set
