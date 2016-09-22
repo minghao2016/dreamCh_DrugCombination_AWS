@@ -15,8 +15,8 @@ class Supervisor():
                 'condor_submit': ['condor_submit'],
                 'condor_submit_dag': ['condor_submit_dag'],
                 'condor_q': {
-                    'run':  ['condor_q', '-global', '-run'],
-                    'held': ['condor_q', '-global', '-held']
+                    'run':  ['condor_q'],
+                    'held': ['condor_q', '-held']
                 }
         }
 
@@ -30,7 +30,6 @@ class Supervisor():
         jobs = check_output(self.command['condor_q'][q_type])
 
         #lines = jobs.strip().split('\n')
-
         if 'condor_dagman' in jobs:
             return True
         else:

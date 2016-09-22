@@ -57,10 +57,9 @@ class Generator():
 
         if job_num != 2 and job_num != 4:
             submit_form.append('\n'.join(self.log_paths))
-
-        """Write all logs
+        ###Write all logs
         #submit_form.append('\n'.join(self.log_paths))
-        """
+
 
         if 'queue_num' in config:
             submit_form.append('queue ' + str(config['queue_num']))
