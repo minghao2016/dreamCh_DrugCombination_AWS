@@ -33,9 +33,9 @@ class Generator():
 
     def __set_log_path__(self):
         self.log_paths = [
-                'output = log/' + '.'.join([str(self.round_num), str(self.job_num), '$(Cluster)','out']),
-                'log = log/'    + '.'.join([str(self.round_num), str(self.job_num), '$(Cluster)','log']),
-                'error = log/'  + '.'.join([str(self.round_num), str(self.job_num), '$(Cluster)','err'])
+                'output = log/' + '.'.join([str(self.job_num), '$(Cluster)','out']),
+                'log = log/'    + '.'.join([str(self.job_num), '$(Cluster)','log']),
+                'error = log/'  + '.'.join([str(self.job_num), '$(Cluster)','err'])
                 ]
 
     def get_submit_content(self, job_num):
@@ -55,10 +55,12 @@ class Generator():
                 config['requirements'],
                 'arguments = ' + ' '.join(arguments)]
 
+        """
         if job_num != 2 and job_num != 4:
             submit_form.append('\n'.join(self.log_paths))
+        """
         ###Write all logs
-        #submit_form.append('\n'.join(self.log_paths))
+        submit_form.append('\n'.join(self.log_paths))
 
 
         if 'queue_num' in config:
@@ -99,9 +101,25 @@ class Generator():
 
         contents = list()
 
-        for c_value, gamma_value, dataset_num in params:
-            self.config[2]['arguments'] = ['J2.py', str(c_value), str(gamma_value), str(dataset_num)]
+        for feature_candidate, c_value, gamma_value, dataset_num in params:
+            self.config[2]['arguments'] = ['J2.py', feature_candidate, str(c_value), str(gamma_value), str(dataset_num)]
             contents.append(self.get_submit_content(2))
+
+        return contents
+
+    def get_submit_content_job3(self, include_features):
+        params = job2_param_gen(self.round_num, self.j1_type, include_features)
+
+        contents = list()
+        features = set()
+
+        for feature_candidate, c_value, gamma_value, dataset_num in params:
+            features.add(feature_candidate)
+        for feature in features:
+            self.config[3]['arguments'] = ['J3.py', feature]
+            self.config[3]['inputs'][1] = 'J2condor/result/' + feature
+            contents.append(self.get_submit_content(3))
+
         return contents
 
     def get_submit_content_job4(self, include_features):
@@ -114,7 +132,7 @@ class Generator():
             contents.append(self.get_submit_content(4))
         return contents
 
-    def get_dagman_content(self, round_num, job4_size):
+    def get_dagman_content(self, round_num, job4_size=0):
         round_num = str(round_num)
 
         submit_dir = '/'.join(['submit', round_num])
@@ -136,18 +154,12 @@ class Generator():
             j2_list.append('SECOND' + idx)
 
         #dependencies.append('PARENT FIRST CHILD ' + ' '.join(j2_list))
-
         # job3
         jobs.append('JOB THIRD ' + submit_dir + '/3.0.submit')
         dependencies.append('PARENT ' + ' '.join(j2_list) + ' CHILD THIRD')
+        """
         # job4
         j4_list = list()
-        """
-        if self.j1_type == 'a':
-            job4_size = 9540
-        else:
-            job4_size = 5870
-        """
 
         for job4_idx in range(job4_size):
             idx = str(job4_idx)
@@ -166,4 +178,6 @@ class Generator():
         #job6
         jobs.append('JOB SIXTH ' + submit_dir + '/6.0.submit')
         dependencies.append('PARENT FIFTH  CHILD SIXTH')
+        """
         return '\n'.join(['\n'.join(jobs),'\n'.join(dependencies)])
+

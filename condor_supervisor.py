@@ -1,9 +1,13 @@
 import re, time, os, shutil, sys
 import email_sender
+from pprint import pprint
 from subprocess import check_output, call
 from JobGenerator.generator import Generator as Job_Generator
 from jobs import J1
 from jobs import svr as testset_svr
+import glob
+import pandas as pd
+from operator import itemgetter
 
 class Supervisor():
     def __init__(self, round_num, j1_type='a', problem_num='a'):
@@ -39,22 +43,43 @@ class Supervisor():
     Execute new cycle
     """
     def execute_new_cycle(self):
+        if self.round_num != 0:
+            print "## Previous round result"
+            try:
+                os.makedirs('/'.join(['data', str(self.round_num-1), 'J6condor', 'result']))
+            except:
+                pass
 
-        # Step1 :
-        """
-        if self.round_num != 0:
-            self.move_J1data()
-        """
-        """
-        if self.round_num != 0:
-            self.eval_testset()
-        """
+            result_included_features = dict()
+
+            base_dir = '/'.join(['data', str(self.round_num-1), 'J3condor', 'result']) + '/'
+            for feature_dir in glob.glob(base_dir+'**'):
+                feature = feature_dir.split('/')[-1]
+                df = pd.read_csv('/'.join([feature_dir, 'baseline.csv']))
+                mean = df.baseline.mean()
+                df = pd.read_csv('/'.join([feature_dir, 'parameter.csv']))
+                C = str(df.C[0])
+                gamma = str(df.Gamma[0])
+
+                result_included_features[(feature, C, gamma)] = mean
+
+            sorted_test = sorted(result_included_features.items(), key=itemgetter(1), reverse=True)
+            pprint(sorted_test)
+            # select top1 feature
+            best_test = sorted_test[0][0]
+            f = open('/'.join(['data', str(self.round_num-1), 'J6condor', 'result', 'add_feature.txt']), 'w')
+            f.write(best_test[0])
+            f.close()
+
+            shutil.copy('/'.join([base_dir,best_test[0], 'parameter.csv']),'/'.join(['data', str(self.round_num-1), 'J6condor', 'parameter.csv']))
+
+
 
         # execute J1
         #removed_feature_indexes = self.execute_job1_distribute_data()
         default_features  = J1.execute(self.round_num)
         #TODO: send previous baseline and remove feature cnt
-        self.send_result2email(default_features)
+        #self.send_result2email(default_features)
 
         # Step2 : Generate new condor submit according to target dir path
         submit_file_path = self.generate_submit_form(default_features)
@@ -69,6 +94,7 @@ class Supervisor():
 
     ################################3
     ## Eval in Testset
+    """
     def get_excluded_list(self):
         target_path = 'excludedIndexes.txt'
         f = open(target_path)
@@ -103,7 +129,6 @@ class Supervisor():
                 excluded_list,
                 self.problem_num)
 
-    """ EXCLUDE VER
     def execute_job1_distribute_data(self):
         #step1 : execute Job on locally
         print "job1 execute"
@@ -127,10 +152,11 @@ class Supervisor():
         target_dir = '/'.join(['submit', str(self.round_num)])
         os.makedirs(target_dir)
 
-        # TODO: clean below dirty code
-        for job_num in range(2,7):
+        for job_num in range(2,4):
             if job_num == 2:
                 submit_content = self.job_gen.get_submit_content_job2(include_features)
+            elif job_num == 3:
+                submit_content = self.job_gen.get_submit_content_job3(include_features)
             elif job_num == 4:
                 submit_content = self.job_gen.get_submit_content_job4(include_features)
                 job4_size = len(submit_content)
@@ -144,6 +170,7 @@ class Supervisor():
                 f.write(submit_content[proc_num])
                 f.close()
 
+        job4_size = 0
         dag_content = self.job_gen.get_dagman_content(self.round_num, job4_size)
         f = open('/'.join([target_dir, 'DAGman.' + str(self.round_num) + '.dag']), 'a')
         f.write(dag_content)
@@ -212,7 +239,6 @@ if __name__ == '__main__':
             #TODO: nothing to do
             pass
         elif supervisor.exist_jobs('held'):
-            print "Job Held!"
             email_sender.send("Job held!!!")
             sys.exit()
         else:

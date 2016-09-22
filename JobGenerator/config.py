@@ -13,7 +13,7 @@ j2 = {
 }
 
 j3 = {
-    'inputs': ['jobs/J3.py', 'J2condor', ],
+    'inputs': ['jobs/J3.py', 'J2condor/result/'],
     'outputs': [],
     'arguments': ['J3.py'],
     'requirements': 'Requirements = (OpSys == "LINUX")'

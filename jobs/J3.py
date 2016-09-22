@@ -20,6 +20,7 @@ from sklearn.metrics import mean_squared_error
 
 round_num = sys.argv[1]
 problemNum = sys.argv[2]
+feature_candidate = sys.argv[3]
 min_variance = 20
 
 def get_mse(obs, pred):
@@ -29,10 +30,13 @@ def get_mse(obs, pred):
     return mse
 
 def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
+
     if not os.path.isdir("data/" + round_num + "/J3condor"):
         os.makedirs("data/" + round_num + "/J3condor")
     if not os.path.isdir("data/" + round_num + "/J3condor/result"):
         os.makedirs("data/" + round_num + "/J3condor/result")
+    if not os.path.isdir("data/" + round_num + "/J3condor/result/" + feature_candidate):
+        os.makedirs("data/" + round_num + "/J3condor/result/" + feature_candidate)
 
     importr('plyr')
     robjects.r('''
@@ -342,20 +346,23 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
     valuedict_mse = {}
     indexvaluedict_mse = {}
     """
-
-    for fname in glob.glob(resultFilePath+"*.csv"):
+    print "ROOT: " + resultFilePath
+    print os.listdir('.')
+    print os.listdir(resultFilePath)
+    for fname in glob.glob(resultFilePath+"/*.csv"):
         print fname
         only_filename = fname.replace('\\','/').split('/')[-1]
         # print fname
-        parampostfx = only_filename.split("svm_result")[1].split(".csv")[0]
+        parampostfx = only_filename.split("svm_result_")[1].split(".csv")[0]
+        print "\t-->" + parampostfx
 
         Index = parampostfx.split("_")[-1]
         C = parampostfx.split("_")[0]
         Gamma = parampostfx.split("_")[1]
+        print "\t-->", Index, C, Gamma
 
         trainDir = testDirList[int(Index)]
 
-        print trainDir, fname
         if problemNum == "2" :
             value = robjects.r['getGlobalScore_ch2'](trainDir, fname)[0]
 
@@ -384,10 +391,10 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
         valuedict_mse[C+"_"+Gamma] = l
         indexvaluedict_mse[C+"_"+Gamma+"_"+Index] = mse
         """
-
     maxparam = "0.0_0.0"
     maxvalue = -1
 
+    print c_dict
     # find means
     mean_dict = dict()
     for k,v in c_dict.items():
@@ -401,7 +408,7 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
             (float(mean_dict[mean]['C']), mean)
             for mean in target_mean_indices
             ]
-
+    print target_C_mean
     sorted_target_C = sorted(target_C_mean)
 
     # mid C
@@ -429,11 +436,15 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
     cv_mean = sum(cv_result) / len(cv_result)
     #########################################
     # correlation
+    f = open('/'.join(['data',round_num,'J3condor', 'result',feature_candidate,'fullresult.txt']), 'w')
+
     for key in valuedict:
         meanvalue = np.mean(valuedict[key])
+        f.write(key + "\t" + str(meanvalue) + "\n")
         if maxvalue < meanvalue:
             maxparam = key
             maxvalue = meanvalue
+    f.close()
     finalC = maxparam.split("_")[0]
     finalGamma = maxparam.split("_")[1]
     valuelist = []
@@ -453,37 +464,6 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
         f.flush()
     f.close()
 
-    """
-    # mse
-    minparam = "0.0_0.0"
-    minvalue = 1000000
-    for key in valuedict:
-        meanvalue = np.mean(valuedict_mse[key])
-        if minvalue >  meanvalue:
-            minparam = key
-            minvalue = meanvalue
-    finalC_mse = minparam.split("_")[0]
-    finalGamma_mse = minparam.split("_")[1]
-    valuelist_mse = []
-
-    for i in range(10):
-        valuelist_mse.append(indexvaluedict_mse[maxparam+"_"+str(i)])
-    """
-
-
-    """
-    # mse
-    f = open(paramPath + '.mse','w')
-    f.write("C,Gamma\n"+finalC_mse+","+finalGamma_mse+"\n")
-    f.flush()
-    f.close()
-    f = open(baselinePath + '.mse', "w")
-    f.write("index,baseline\n")
-    for i in range(10):
-        f.write(str(i)+","+str(valuelist_mse[i])+'\n')
-        f.flush()
-    f.close()
-    """
 
 # output : both float values. and one list of each index's finalscore Those will be used as C and Gamma params in SVR learning
 
@@ -493,6 +473,6 @@ if __name__ == '__main__':
     testsetList = []
     for i in range(10):
         testsetList.append(testsetpath+str(i)+".csv")
-
     testsetList = sorted(testsetList)
-    findBestParam("J2condor/result/", testsetList, "data/" + round_num + "/J3condor/result/parameter.csv", "data/" + round_num + "/J3condor/result/baseline.csv")
+
+    findBestParam(feature_candidate, testsetList, "data/" + str(round_num) + "/J3condor/result/" + feature_candidate + "/parameter.csv", "data/" + str(round_num) + "/J3condor/result/" + feature_candidate + "/baseline.csv")

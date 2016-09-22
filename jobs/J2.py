@@ -1,6 +1,7 @@
 import sys
 import os
 import pandas as pd
+import csv
 
 from sklearn import svm
 from sklearn.linear_model import MultiTaskLasso
@@ -16,11 +17,20 @@ import sklearn.neighbors as neigbors
 # filePath = "/pizza/"
 # filePath = "C:/Users/Jang/Desktop/pizza/"
 
+# deprecated
+"""
 round_num = int(sys.argv[1])
 problemNum = sys.argv[2]
 value1 = float(sys.argv[3])
 value2 = float(sys.argv[4])
 value4 = int(sys.argv[5])
+"""
+round_num   = int(sys.argv[1])
+problemNum  = sys.argv[2]        # not used in including model
+feature_candidate = sys.argv[3]
+c_value     = float(sys.argv[4])
+gamma_value = float(sys.argv[5])
+set_num     = int(sys.argv[6])
 
 def find_max_index(train_libfm, test_libfm):
     index_list = []
@@ -114,12 +124,20 @@ def get_excluded_list():
 
 def get_default_feature_ids():
     file_path = 'default_ids.txt'
-    f = open(file_path)
+    fids = list()
 
-    excluded_list = list()
+    f = open(file_path)
     for v in f:
-        excluded_list.append( int(v) )
-    return excluded_list
+        fids.append( int(v) )
+
+    # add test feature ids
+    f = open('/features/exclude_' + feature_candidate + '.csv')
+    csv_f = csv.reader(f)
+    csv_f.next()
+    for v in csv_f:
+        fids.append( int(v[0]) )
+    print fids
+    return fids
 
 def run_sklearn(train_hdf, test_hdf,testPredCSV,testCSV , n_est=1000, lr=0.07, depth=7, maxindexBool=False, threshold=20):
     """
@@ -153,7 +171,7 @@ def run_sklearn(train_hdf, test_hdf,testPredCSV,testCSV , n_est=1000, lr=0.07, d
     print len(features_ids)
 
     #regr = GradientBoostingRegressor(n_estimators=n_est, learning_rate=lr, max_depth=depth, random_state=0, loss='ls')
-    regr = svm.SVR(kernel='rbf', C=value1, gamma=value2, epsilon=5)
+    regr = svm.SVR(kernel='rbf', C=c_value, gamma=gamma_value, epsilon=5)
     #regr = ensemble.RandomForestRegressor(n_estimators=value1,max_features=value2, max_depth=value3,n_jobs=4, verbose=1)
     #regr = KernelRidge(kernel='rbf',alpha=value1, gamma=value2)
     #regr = MultiTaskLasso(alpha=1.0)
@@ -164,7 +182,6 @@ def run_sklearn(train_hdf, test_hdf,testPredCSV,testCSV , n_est=1000, lr=0.07, d
     testDF.columns = ["CELL_LINE","COMBINATION_ID","PREDICTION"]
 
     if problemNum=="2" :
-
         pivoted_df = testDF.pivot(index='COMBINATION_ID',columns='CELL_LINE',values='PREDICTION')
         filledpivoted_df = pivoted_df.fillna(0.0)
         filledpivoted_df[filledpivoted_df<threshold] = 0
@@ -177,13 +194,16 @@ def run_sklearn(train_hdf, test_hdf,testPredCSV,testCSV , n_est=1000, lr=0.07, d
 
 
 
+print "round_num: {0}\nproblem: {1}\nfeature: {2}\nc: {3}\ngamma: {4}, set: {5}".format(
+        round_num, problemNum, feature_candidate, c_value, gamma_value, set_num)
+
 
 root_dir = "/hdf/"
-os.makedirs("data/" + str(round_num) + "/J2condor/result/")
-run_sklearn(root_dir + str(value4) + "compact_train.hdf", # single train set
-            root_dir + str(value4) + "compact_validation.hdf", # single test set
-            "data/" + str(round_num) + "/J2condor/result/svm_result"+str(value1)+"_"+str(value2)+"_"+str(value4)+".csv", # result file path
-            root_dir + "/answer/ch1_new_test_set_excluded_"+str(value4)+".csv", # answer set
+os.makedirs("data/" + str(round_num) + "/J2condor/result/" + feature_candidate)
+run_sklearn(root_dir + str(set_num) + "compact_train.hdf", # single train set
+            root_dir + str(set_num) + "compact_validation.hdf", # single test set
+            "data/" + str(round_num) + "/J2condor/result/" + feature_candidate + "/svm_result_" +str(c_value)+"_"+str(gamma_value)+"_"+str(set_num)+".csv", # result file path
+            root_dir + "/answer/ch1_new_test_set_excluded_"+str(set_num)+".csv", # answer set
             maxindexBool=True)
 
 
