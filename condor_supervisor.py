@@ -79,10 +79,13 @@ class Supervisor():
         #removed_feature_indexes = self.execute_job1_distribute_data()
         default_features  = J1.execute(self.round_num)
         #TODO: send previous baseline and remove feature cnt
-        #self.send_result2email(default_features)
-
+        #self.send_result2email(sorted_test)
         # Step2 : Generate new condor submit according to target dir path
         submit_file_path = self.generate_submit_form(default_features)
+
+        # remove previous logs
+        shutil.rmtree('log/')
+        os.makedirs('log')
 
         # Step3 : submit condor job submit file
         print "#Execute Problem1." + self.j1_type
@@ -183,44 +186,35 @@ class Supervisor():
 
         time.sleep(60)
 
-    def send_result2email(self, removed_feature_cnt):
+    def send_result2email(self, sorted_test):
         if self.round_num != 0:
 
-            content = [
-                    ':: ' + self.problem_num + '.' + self.j1_type,
-                    '\n#Round ' + str(self.round_num-1)]
+            content = ['\n#Round ' + str(self.round_num-1)]
 
-            f = open('/'.join(['data', str(self.round_num-1), 'J3condor', 'result', 'parameter.csv']))
-            content.append(f.read())
-            f.close()
-            content.append("\n")
-
-            # CV Set
-            content.append("## CV Set")
-            value_sum = .0
-            f = open('/'.join(['data', str(self.round_num-1), 'J3condor', 'result', 'baseline.csv']))
-            for line in f :
-                if 'index' in line:
-                    continue
-
-                line = line.strip()
-                value_sum += float(line.split(',')[1])
-                content.append(line)
-            f.close()
-
-            content.append("# Avg ")
-            content.append(str(value_sum/10))
-
-            #Test Set
-            """
-            content.append("\n\n#Test Set")
-            f = open('/'.join(['data', str(self.round_num-1), 'J3condor', 'final_result.txt']))
+            base_dir = '/'.join(['data', str(self.round_num-1)])
+            # default feature group
+            f = open('/'.join([base_dir, 'default_groups.txt']))
+            content.append('\n\n# Default Feature Group')
             content.append(f.read())
             f.close()
 
-            content.append('removed feature cnt: ' + str(removed_feature_cnt) + ' in next Round')
+            # new feature gruop
+            f = open('/'.join([base_dir, 'J6condor', 'result', 'add_feature.txt']))
+            content.append('\n\n# Selected new feature group')
+            content.append(f.read())
+            f.close()
+
+            # parameter
+            f = open('/'.join([base_dir, 'J6condor', 'parameter.csv']))
+            content.append('\n\n# Selected Parameter for new feature group')
+            content.append(f.read())
+            f.close()
+
+            # round detail result
+            content.append('\n\n# detail result')
+            content.append(str(sorted_test))
+            print '\n'.join(content)
             email_sender.send('\n'.join(content))
-            """
 
 
 

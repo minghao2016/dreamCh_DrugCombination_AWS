@@ -39,6 +39,13 @@ def params(round_num, j1_type, include_features):
             for feature in all_features
             if feature not in include_features]
 
+    if len(test_features) == 0:
+        print "########################################"
+        print "Done!\nNo remain feature group"
+        print "########################################"
+        sys.exit(0)
+
+
     # packing parameter and group candidates
     values = [
             (feature, c_value, gamma_value, set_num)

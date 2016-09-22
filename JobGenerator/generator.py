@@ -33,8 +33,8 @@ class Generator():
 
     def __set_log_path__(self):
         self.log_paths = [
-                'output = log/' + '.'.join([str(self.job_num), '$(Cluster)','out']),
-                'log = log/'    + '.'.join([str(self.job_num), '$(Cluster)','log']),
+                #'output = log/' + '.'.join([str(self.job_num), '$(Cluster)','out']),
+                #'log = log/'    + '.'.join([str(self.job_num), '$(Cluster)','log']),
                 'error = log/'  + '.'.join([str(self.job_num), '$(Cluster)','err'])
                 ]
 
