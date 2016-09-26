@@ -454,7 +454,7 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
 
     # correlation
     f = open(paramPath,'w')
-    f.write("C,Gamma\n"+best_C+","+finalGamma+"\n")
+    f.write("C,Gamma\n"+final_C+","+finalGamma+"\n")
     f.flush()
     f.close()
     f = open(baselinePath , "w")

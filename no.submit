@@ -1,0 +1,10 @@
+universe = vanilla
+should_transfer_files = IF_NEEDED
+executable = /bin/sh
+should_transfer_files = YES
+transfer_executable = false
+transfer_input_files = no.sh
+Requirements = (OpSys == "LINUX")
+arguments = no.sh
+error = test.error
+queue

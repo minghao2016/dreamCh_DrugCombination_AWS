@@ -153,10 +153,22 @@ class Generator():
             jobs.append('JOB SECOND' + idx + ' ' + submit_dir + '/2.' + idx + '.submit')
             j2_list.append('SECOND' + idx)
 
-        #dependencies.append('PARENT FIRST CHILD ' + ' '.join(j2_list))
+
+        jobs.append('JOB NO no.submit')
+        dependencies.append('PARENT ' + ' '.join(j2_list) + ' CHILD NO')
+
         # job3
-        jobs.append('JOB THIRD ' + submit_dir + '/3.0.submit')
-        dependencies.append('PARENT ' + ' '.join(j2_list) + ' CHILD THIRD')
+        j3_list = list()
+        j3_jobs = glob.glob(submit_dir + '/3.*')
+
+        for job3_idx in range(len(j3_jobs)):
+            idx = str(job3_idx)
+            jobs.append('JOB THIRD' + idx + ' ' + submit_dir + '/3.' + idx + '.submit')
+            j3_list.append('THIRD' + idx)
+
+        dependencies.append('PARENT NO CHILD ' + ' '.join(j3_list))
+
+
         """
         # job4
         j4_list = list()

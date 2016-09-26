@@ -23,15 +23,15 @@ def params(round_num, j1_type, include_features):
         pastRound_bestC = int(float(params[0]))
 
     # c values
-    c_list = range(60, 300, 10)
-    c_list = range(pastRound_bestC - 20*6, pastRound_bestC + 20*6, 20)
+    c_list = range(50, 150, 25)
+    #c_list = range(pastRound_bestC - 20*6, pastRound_bestC + 20*6, 20)
 
     # gamma values
     gamma_list = [x/1000.0 for x in range(1,100,20)]
 
     # for test
-    c_list = range(60, 90, 10)
-    gamma_list = [x/1000.0 for x in range(1,100,25)]
+    #c_list = range(60, 90, 10)
+    #gamma_list = [x/1000.0 for x in range(1,100,25)]
 
     # feature candidates
     include_features = set(include_features)
