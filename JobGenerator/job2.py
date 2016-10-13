@@ -8,9 +8,9 @@ all_features = [
 def params(round_num, j1_type, include_features):
     if round_num == 0:
         if j1_type == 'a':
-            pastRound_bestC = 180
+            pastRound_bestC = 100
         else:
-            pastRound_bestC = 140
+            pastRound_bestC = 100
     else:
         src_file_path = '/'.join(['data', str(round_num-1), 'J6condor', 'parameter.csv'])
         f = open(src_file_path)
@@ -23,8 +23,9 @@ def params(round_num, j1_type, include_features):
         pastRound_bestC = int(float(params[0]))
 
     # c values
-    c_list = range(50, 150, 25)
+    #c_list = range(50, 150, 25)
     #c_list = range(pastRound_bestC - 20*6, pastRound_bestC + 20*6, 20)
+    c_list = range(pastRound_bestC - 25*2, pastRound_bestC + 25*2, 25)
 
     # gamma values
     gamma_list = [x/1000.0 for x in range(1,100,20)]

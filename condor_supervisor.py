@@ -85,7 +85,7 @@ class Supervisor():
         # remove previous logs
         shutil.rmtree('log/')
         os.makedirs('log')
-
+        sys.exit(-10)
         # Step3 : submit condor job submit file
         print "#Execute Problem1." + self.j1_type
         print "#Round " + str(self.round_num)
@@ -230,14 +230,20 @@ class Supervisor():
             email_sender.send('\n'.join(content))
 
 if __name__ == '__main__':
-    # round number, data set type, problem num
-    #supervisor = Supervisor(sys.argv[1], sys.argv[2], sys.argv[3])
-    if len(sys.argv) == 1:
-        start_round = 0
-    else:
-        start_round = sys.argv[1]
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-round', type=int, required=False, default=0)
+    parser.add_argument('-ch', type=int, required=True,
+            help='challenge number: 1 or 2')
+    args = parser.parse_args()
 
-    supervisor = Supervisor(start_round)
+    start_round = args.round
+    problem_num = args.ch
+
+    print '-------------------------------'
+    print 'Start Round: {0}\nCh_num: {1}'.format(start_round, problem_num)
+    print '-------------------------------'
+    supervisor = Supervisor(start_round, problem_num=problem_num)
 
     while True:
         if supervisor.exist_jobs('run'):

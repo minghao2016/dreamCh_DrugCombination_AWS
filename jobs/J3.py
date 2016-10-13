@@ -369,6 +369,8 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
         else :
             value = robjects.r['getGlobalScore_ch1'](trainDir, fname)[1]
 
+        print "value", value
+
 
         if C+"_"+Gamma not in valuedict:
             valuedict[C+"_"+Gamma] = []
@@ -408,9 +410,9 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
             (float(mean_dict[mean]['C']), mean)
             for mean in target_mean_indices
             ]
-    print target_C_mean
+    print "TARGET_C_mean", target_C_mean
     sorted_target_C = sorted(target_C_mean)
-
+    print "SORTED_TARGET_C", sorted_target_C
     # mid C
     mid_C = sorted_target_C[1][0]
     # variance
@@ -454,7 +456,7 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
 
     # correlation
     f = open(paramPath,'w')
-    f.write("C,Gamma\n"+final_C+","+finalGamma+"\n")
+    f.write("C,Gamma\n"+finalC+","+finalGamma+"\n")
     f.flush()
     f.close()
     f = open(baselinePath , "w")
