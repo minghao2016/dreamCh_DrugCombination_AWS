@@ -363,6 +363,7 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
 
         trainDir = testDirList[int(Index)]
 
+        print "ProblemNum: ", problemNum
         if problemNum == "2" :
             value = robjects.r['getGlobalScore_ch2'](trainDir, fname)[0]
 
@@ -440,6 +441,8 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
     # correlation
     f = open('/'.join(['data',round_num,'J3condor', 'result',feature_candidate,'fullresult.txt']), 'w')
 
+    print 'valuedict'
+    print valuedict
     for key in valuedict:
         meanvalue = np.mean(valuedict[key])
         f.write(key + "\t" + str(meanvalue) + "\n")
@@ -451,6 +454,9 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
     finalGamma = maxparam.split("_")[1]
     valuelist = []
 
+    print 'maxparam', maxparam
+    print 'maxvalue', maxvalue
+    print indexvaluedict
     for i in range(10):
         valuelist.append(indexvaluedict[maxparam+"_"+str(i)])
 

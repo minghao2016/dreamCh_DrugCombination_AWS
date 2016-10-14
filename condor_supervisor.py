@@ -85,7 +85,6 @@ class Supervisor():
         # remove previous logs
         shutil.rmtree('log/')
         os.makedirs('log')
-        sys.exit(-10)
         # Step3 : submit condor job submit file
         print "#Execute Problem1." + self.j1_type
         print "#Round " + str(self.round_num)
