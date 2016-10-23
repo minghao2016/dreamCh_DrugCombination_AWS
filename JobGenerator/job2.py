@@ -25,10 +25,10 @@ def params(round_num, j1_type, include_features):
     # c values
     #c_list = range(50, 150, 25)
     #c_list = range(pastRound_bestC - 20*6, pastRound_bestC + 20*6, 20)
-    c_list = range(pastRound_bestC - 25*2, pastRound_bestC + 25*2, 25)
+    c_list = range(pastRound_bestC - 10*3, pastRound_bestC + 10*3, 10)
 
     # gamma values
-    gamma_list = [x/1000.0 for x in range(1,100,20)]
+    gamma_list = [x/1000.0 for x in range(40,100,20)]
 
     # for test
     #c_list = range(60, 90, 10)

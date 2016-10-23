@@ -6,5 +6,4 @@ transfer_executable = false
 transfer_input_files = no.sh
 Requirements = (OpSys == "LINUX")
 arguments = no.sh
-error = test.error
 queue

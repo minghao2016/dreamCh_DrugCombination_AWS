@@ -1,4 +1,4 @@
-
+import math
 import pandas as pd
 import os
 import numpy as np
@@ -415,7 +415,10 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
     sorted_target_C = sorted(target_C_mean)
     print "SORTED_TARGET_C", sorted_target_C
     # mid C
-    mid_C = sorted_target_C[1][0]
+    if len(sorted_target_C) == 1:
+        mid_C = sorted_target_C[0][0]
+    else:
+        mid_C = sorted_target_C[1][0]
     # variance
     variance = mid_C / 20.0
     if variance < min_variance :
@@ -426,10 +429,12 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
 
 
     # find best C
-    (max_mean, max_c) = (0.0, 0.0)
+    (max_mean, max_c) = (-100.0, 0.0)
+    print sorted_target_C
     for (C, mean) in sorted_target_C:
         f_mean = float(mean)
-        if C >= start and C <= end and f_mean > float(max_mean):
+        f_mean = abs(f_mean)
+        if C >= start and C <= end and f_mean >= float(max_mean):
             (max_mean, max_c) = (mean, C)
 
     maxC_dict = mean_dict[max_mean]
@@ -444,11 +449,22 @@ def findBestParam(resultFilePath, testDirList, paramPath, baselinePath):
     print 'valuedict'
     print valuedict
     for key in valuedict:
-        meanvalue = np.mean(valuedict[key])
+        """
+        if valuedict[key] == float('NaN'):
+           valuedict[key] = 0.0
+        """
+        scores = np.array(valuedict[key])
+        print np.isnan(scores)
+        scores[np.isnan(scores)] = 0
+        valuedict[key] = scores
+
+        meanvalue = np.mean(scores)
         f.write(key + "\t" + str(meanvalue) + "\n")
         if maxvalue < meanvalue:
             maxparam = key
             maxvalue = meanvalue
+    print 'valuedict'
+    print valuedict
     f.close()
     finalC = maxparam.split("_")[0]
     finalGamma = maxparam.split("_")[1]

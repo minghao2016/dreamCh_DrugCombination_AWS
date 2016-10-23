@@ -203,7 +203,7 @@ print "round_num: {0}\nproblem: {1}\nfeature: {2}\nc: {3}\ngamma: {4}, set: {5}"
 root_dir = "/hdf/"
 os.makedirs("data/" + str(round_num) + "/J2condor/result/" + feature_candidate)
 run_sklearn(root_dir + str(set_num) + "compact_train.hdf", # single train set
-            root_dir + str(set_num) + "compact_test.hdf", # single test set
+            root_dir + str(set_num) + "compact_validation.hdf", # single test set
             "data/" + str(round_num) + "/J2condor/result/" + feature_candidate + "/svm_result_" +str(c_value)+"_"+str(gamma_value)+"_"+str(set_num)+".csv", # result file path
             root_dir + "/answer/ch1_new_test_set_excluded_"+str(set_num)+".csv", # answer set
             maxindexBool=True)
