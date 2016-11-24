@@ -107,3 +107,4 @@ log
 excludedTestSet
 validtest
 email_sender.py
+uploader.sh
